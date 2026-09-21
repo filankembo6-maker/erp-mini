@@ -11,8 +11,9 @@ class ClientController extends Controller
     public function index()
     {
         $clients = Client::orderBy('created_at', 'desc')->get();
+
         return Inertia::render('Clients/Index', [
-            'clients' => $clients
+            'clients' => $clients,
         ]);
     }
 
@@ -40,14 +41,14 @@ class ClientController extends Controller
     public function show(Client $client)
     {
         return Inertia::render('Clients/Show', [
-            'client' => $client
+            'client' => $client,
         ]);
     }
 
     public function edit(Client $client)
     {
         return Inertia::render('Clients/Edit', [
-            'client' => $client
+            'client' => $client,
         ]);
     }
 
@@ -55,7 +56,7 @@ class ClientController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:clients,email,' . $client->id,
+            'email' => 'required|email|unique:clients,email,'.$client->id,
             'phone' => 'nullable|string|max:30',
             'address' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:100',

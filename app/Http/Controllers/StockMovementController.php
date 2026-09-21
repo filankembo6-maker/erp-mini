@@ -17,15 +17,16 @@ class StockMovementController extends Controller
             ->get();
 
         return Inertia::render('StockMovements/Index', [
-            'movements' => $movements
+            'movements' => $movements,
         ]);
     }
 
     public function create()
     {
         $products = Product::orderBy('name')->get(['id', 'name', 'sku', 'stock_quantity']);
+
         return Inertia::render('StockMovements/Create', [
-            'products' => $products
+            'products' => $products,
         ]);
     }
 
@@ -42,7 +43,7 @@ class StockMovementController extends Controller
             $product = Product::lockForUpdate()->findOrFail($validated['product_id']);
 
             if ($validated['type'] === 'sortie' && $product->stock_quantity < $validated['quantity']) {
-                abort(422, 'Stock insuffisant. Disponible : ' . $product->stock_quantity);
+                abort(422, 'Stock insuffisant. Disponible : '.$product->stock_quantity);
             }
 
             StockMovement::create([

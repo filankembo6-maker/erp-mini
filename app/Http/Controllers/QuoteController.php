@@ -3,15 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use App\Models\Invoice;
+use App\Models\InvoiceItem;
 use App\Models\Product;
 use App\Models\Quote;
 use App\Models\QuoteItem;
-use App\Models\Invoice;
-use App\Models\InvoiceItem;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class QuoteController extends Controller
 {
@@ -22,7 +22,7 @@ class QuoteController extends Controller
             ->get();
 
         return Inertia::render('Quotes/Index', [
-            'quotes' => $quotes
+            'quotes' => $quotes,
         ]);
     }
 
@@ -49,7 +49,7 @@ class QuoteController extends Controller
         ]);
 
         DB::transaction(function () use ($validated, $request) {
-            $reference = 'DEV-' . date('Y') . '-' . str_pad(Quote::count() + 1, 4, '0', STR_PAD_LEFT);
+            $reference = 'DEV-'.date('Y').'-'.str_pad(Quote::count() + 1, 4, '0', STR_PAD_LEFT);
 
             $total = collect($validated['items'])->sum(function ($item) {
                 return $item['quantity'] * $item['unit_price'];
@@ -82,7 +82,7 @@ class QuoteController extends Controller
         $quote->load(['client', 'user', 'items.product']);
 
         return Inertia::render('Quotes/Show', [
-            'quote' => $quote
+            'quote' => $quote,
         ]);
     }
 
@@ -102,7 +102,7 @@ class QuoteController extends Controller
         }
 
         DB::transaction(function () use ($quote) {
-            $reference = 'FAC-' . date('Y') . '-' . str_pad(Invoice::count() + 1, 4, '0', STR_PAD_LEFT);
+            $reference = 'FAC-'.date('Y').'-'.str_pad(Invoice::count() + 1, 4, '0', STR_PAD_LEFT);
 
             $invoice = Invoice::create([
                 'client_id' => $quote->client_id,
@@ -135,6 +135,6 @@ class QuoteController extends Controller
 
         $pdf = Pdf::loadView('pdf.quote', ['quote' => $quote]);
 
-        return $pdf->download('devis-' . $quote->reference . '.pdf');
+        return $pdf->download('devis-'.$quote->reference.'.pdf');
     }
 }

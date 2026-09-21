@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Invoice;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class InvoiceController extends Controller
 {
@@ -16,7 +16,7 @@ class InvoiceController extends Controller
             ->get();
 
         return Inertia::render('Invoices/Index', [
-            'invoices' => $invoices
+            'invoices' => $invoices,
         ]);
     }
 
@@ -25,7 +25,7 @@ class InvoiceController extends Controller
         $invoice->load(['client', 'user', 'items.product', 'quote']);
 
         return Inertia::render('Invoices/Show', [
-            'invoice' => $invoice
+            'invoice' => $invoice,
         ]);
     }
 
@@ -55,6 +55,6 @@ class InvoiceController extends Controller
 
         $pdf = Pdf::loadView('pdf.invoice', ['invoice' => $invoice]);
 
-        return $pdf->download('facture-' . $invoice->reference . '.pdf');
+        return $pdf->download('facture-'.$invoice->reference.'.pdf');
     }
 }

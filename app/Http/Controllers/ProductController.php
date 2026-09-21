@@ -11,8 +11,9 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::orderBy('created_at', 'desc')->get();
+
         return Inertia::render('Products/Index', [
-            'products' => $products
+            'products' => $products,
         ]);
     }
 
@@ -41,14 +42,14 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         return Inertia::render('Products/Show', [
-            'product' => $product
+            'product' => $product,
         ]);
     }
 
     public function edit(Product $product)
     {
         return Inertia::render('Products/Edit', [
-            'product' => $product
+            'product' => $product,
         ]);
     }
 
@@ -56,7 +57,7 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'sku' => 'required|string|max:100|unique:products,sku,' . $product->id,
+            'sku' => 'required|string|max:100|unique:products,sku,'.$product->id,
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',

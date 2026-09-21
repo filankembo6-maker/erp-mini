@@ -1,11 +1,11 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ClientController;
-use App\Http\Controllers\StockMovementController;
-use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\QuoteController;
+use App\Http\Controllers\StockMovementController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
