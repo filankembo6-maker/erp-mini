@@ -1,94 +1,121 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Head, Link, usePage, router } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
 
-const props = defineProps({
-    clients: Array,
+const props = defineProps({ clients: Array });
+const page = usePage();
+const search = ref('');
+
+const filtered = computed(() => {
+    if (!search.value) return props.clients;
+    const q = search.value.toLowerCase();
+    return props.clients.filter(c =>
+        c.name.toLowerCase().includes(q) ||
+        c.email.toLowerCase().includes(q) ||
+        (c.phone && c.phone.includes(q))
+    );
 });
 
-const page = usePage();
+const deleteClient = (id, name) => {
+    if (confirm(`Supprimer "${name}" ?`)) {
+        router.delete(route('clients.destroy', id));
+    }
+};
 </script>
 
 <template>
     <Head title="Clients" />
 
     <AuthenticatedLayout>
-        <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Gestion des Clients
-            </h2>
-        </template>
+        <div class="max-w-[1400px] mx-auto space-y-6">
 
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                
-                <div v-if="page.props.flash?.success" class="mb-4 p-4 bg-green-100 text-green-800 rounded">
-                    {{ page.props.flash.success }}
+            <div class="flex flex-wrap items-end justify-between gap-4">
+                <div>
+                    <h1 class="text-[26px] font-semibold text-[#0a0a0a] tracking-[-0.02em]">Clients</h1>
+                    <p class="text-[13px] text-[#737373] mt-1">Répertoire commercial</p>
                 </div>
+                <Link :href="route('clients.create')"
+                      class="inline-flex items-center gap-2 h-10 px-4 rounded-xl text-[13px] font-semibold bg-[#0a0a0a] hover:bg-[#166534] text-white transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Nouveau client
+                </Link>
+            </div>
 
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 text-gray-900">
-                        
-                        <div class="mb-4 flex justify-end">
-                            <Link
-                                :href="route('clients.create')"
-                                class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                            >
-                                + Ajouter un client
-                            </Link>
-                        </div>
+            <div v-if="page.props.flash?.success" class="px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-200 text-[13px] text-emerald-800">
+                {{ page.props.flash.success }}
+            </div>
 
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Téléphone</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ville</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr v-for="client in clients" :key="client.id">
-                                        <td class="px-6 py-4">{{ client.name }}</td>
-                                        <td class="px-6 py-4">{{ client.email }}</td>
-                                        <td class="px-6 py-4">{{ client.phone || '-' }}</td>
-                                        <td class="px-6 py-4">{{ client.city || '-' }}</td>
-                                        <td class="px-6 py-4 space-x-2">
-                                            <Link
-                                                :href="route('clients.show', client.id)"
-                                                class="text-gray-600 hover:underline"
-                                            >
-                                                Voir
-                                            </Link>
-                                            <Link
-                                                :href="route('clients.edit', client.id)"
-                                                class="text-blue-600 hover:underline"
-                                            >
-                                                Modifier
-                                            </Link>
-                                            <Link
-                                                :href="route('clients.destroy', client.id)"
-                                                method="delete"
-                                                as="button"
-                                                class="text-red-600 hover:underline"
-                                                @click.prevent="confirm('Supprimer ce client ?') && $event.target.closest('a').click()"
-                                            >
-                                                Supprimer
-                                            </Link>
-                                        </td>
-                                    </tr>
-                                    <tr v-if="clients.length === 0">
-                                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
-                                            Aucun client pour le moment.
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+            <div class="bg-white rounded-2xl border border-[#e7e5e4]">
+                <div class="p-4 border-b border-[#f5f5f4]">
+                    <div class="relative w-full max-w-md">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                            <svg class="w-4 h-4 text-[#a3a3a3]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
                         </div>
+                        <input v-model="search" type="search" placeholder="Rechercher un client..."
+                               class="w-full h-10 pl-10 pr-4 rounded-lg bg-[#fafaf9] border border-[#e7e5e4] text-[13px] focus:outline-none focus:border-[#166534] focus:bg-white" />
                     </div>
                 </div>
+
+                <div v-if="clients.length === 0" class="px-6 py-20 text-center">
+                    <h3 class="text-[15px] font-semibold text-[#0a0a0a]">Aucun client</h3>
+                    <p class="text-[13px] text-[#737373] mt-1.5">Ajoutez votre premier client.</p>
+                </div>
+
+                <table v-else class="w-full">
+                    <thead>
+                        <tr class="border-b border-[#f5f5f4]">
+                            <th class="px-6 py-3 text-left text-[10px] font-semibold text-[#a3a3a3] uppercase tracking-wider">Client</th>
+                            <th class="px-6 py-3 text-left text-[10px] font-semibold text-[#a3a3a3] uppercase tracking-wider">Contact</th>
+                            <th class="px-6 py-3 text-left text-[10px] font-semibold text-[#a3a3a3] uppercase tracking-wider">Ville</th>
+                            <th class="px-6 py-3 text-right text-[10px] font-semibold text-[#a3a3a3] uppercase tracking-wider w-32"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="client in filtered" :key="client.id" class="border-b border-[#fafaf9] hover:bg-[#fafaf9]">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-full bg-[#0a0a0a] flex items-center justify-center text-white text-[12px] font-semibold shrink-0">
+                                        {{ client.name.charAt(0).toUpperCase() }}
+                                    </div>
+                                    <div class="text-[13px] font-medium text-[#0a0a0a]">{{ client.name }}</div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <a :href="`mailto:${client.email}`" class="text-[12px] text-[#166534] hover:underline block">{{ client.email }}</a>
+                                <a v-if="client.phone" :href="`tel:${client.phone}`" class="text-[12px] text-[#737373] hover:underline">{{ client.phone }}</a>
+                            </td>
+                            <td class="px-6 py-4 text-[12px] text-[#737373]">{{ client.city || '—' }}</td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center justify-end gap-0.5">
+                                    <Link :href="route('clients.show', client.id)" aria-label="Voir"
+                                          class="w-8 h-8 rounded-lg text-[#737373] hover:text-[#0a0a0a] hover:bg-white flex items-center justify-center transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                    </Link>
+                                    <Link :href="route('clients.edit', client.id)" aria-label="Modifier"
+                                          class="w-8 h-8 rounded-lg text-[#737373] hover:text-[#166534] hover:bg-white flex items-center justify-center transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </Link>
+                                    <button @click="deleteClient(client.id, client.name)" aria-label="Supprimer"
+                                            class="w-8 h-8 rounded-lg text-[#737373] hover:text-red-600 hover:bg-white flex items-center justify-center transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </AuthenticatedLayout>

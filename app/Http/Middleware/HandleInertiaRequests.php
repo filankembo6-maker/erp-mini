@@ -24,6 +24,7 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
             ],
+            'show_splash' => fn () => $request->session()->pull('show_splash', false),
         ]);
     }
 }

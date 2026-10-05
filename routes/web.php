@@ -1,41 +1,38 @@
 <?php
 
-use App\Http\Controllers\ClientController;
-use App\Http\Controllers\InvoiceController;
-use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\QuoteController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\StockMovementController;
+use App\Http\Controllers\QuoteController;
+use App\Http\Controllers\InvoiceController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-    ]);
+    return Auth::check()
+        ? redirect()->route('dashboard')
+        : redirect()->route('login');
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Produits (admin + magasinier)
     Route::middleware('role:admin,magasinier')->group(function () {
         Route::resource('products', ProductController::class);
     });
 
-    // Clients (admin + commercial)
     Route::middleware('role:admin,commercial')->group(function () {
         Route::resource('clients', ClientController::class);
     });
 
-    // Stocks (admin + magasinier)
     Route::middleware('role:admin,magasinier')->group(function () {
         Route::get('stock-movements', [StockMovementController::class, 'index'])->name('stock-movements.index');
         Route::get('stock-movements/create', [StockMovementController::class, 'create'])->name('stock-movements.create');
@@ -43,7 +40,6 @@ Route::middleware('auth')->group(function () {
         Route::delete('stock-movements/{stockMovement}', [StockMovementController::class, 'destroy'])->name('stock-movements.destroy');
     });
 
-    // Devis (admin + commercial)
     Route::middleware('role:admin,commercial')->group(function () {
         Route::get('quotes', [QuoteController::class, 'index'])->name('quotes.index');
         Route::get('quotes/create', [QuoteController::class, 'create'])->name('quotes.create');
@@ -54,7 +50,6 @@ Route::middleware('auth')->group(function () {
         Route::post('quotes/{quote}/convert', [QuoteController::class, 'convertToInvoice'])->name('quotes.convert');
     });
 
-    // Factures (admin + commercial)
     Route::middleware('role:admin,commercial')->group(function () {
         Route::get('invoices', [InvoiceController::class, 'index'])->name('invoices.index');
         Route::get('invoices/{invoice}/pdf', [InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');
