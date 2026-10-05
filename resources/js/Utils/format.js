@@ -14,6 +14,7 @@ export const formatCFAShort = (amount) => {
 };
 
 export const formatDate = (date) => {
+    if (!date) return '';
     return new Date(date).toLocaleDateString('fr-FR', {
         day: '2-digit',
         month: 'short',
@@ -22,6 +23,7 @@ export const formatDate = (date) => {
 };
 
 export const formatDateTime = (date) => {
+    if (!date) return '';
     return new Date(date).toLocaleString('fr-FR', {
         day: '2-digit',
         month: 'short',
@@ -32,6 +34,7 @@ export const formatDateTime = (date) => {
 };
 
 export const formatRelative = (date) => {
+    if (!date) return '';
     const now = new Date();
     const d = new Date(date);
     const diffMs = now - d;
@@ -44,4 +47,14 @@ export const formatRelative = (date) => {
     if (diffHours < 24) return `Il y a ${diffHours} h`;
     if (diffDays < 7) return `Il y a ${diffDays} j`;
     return formatDate(date);
+};
+
+export const formatNumber = (value) => {
+    const num = Math.round(parseFloat(value) || 0);
+    return new Intl.NumberFormat('fr-FR').format(num);
+};
+
+export const formatPercent = (value) => {
+    const num = parseFloat(value) || 0;
+    return num.toFixed(1).replace('.0', '') + ' %';
 };

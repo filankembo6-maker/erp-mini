@@ -9,7 +9,18 @@ class Quote extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['client_id', 'user_id', 'reference', 'total_amount', 'status'];
+    protected $fillable = [
+        'client_id', 'user_id', 'reference', 'total_amount', 'subtotal',
+        'tax_amount', 'discount_amount', 'status', 'valid_until', 'notes', 'payment_terms',
+    ];
+
+    protected $casts = [
+        'valid_until' => 'date',
+        'total_amount' => 'decimal:2',
+        'subtotal' => 'decimal:2',
+        'tax_amount' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
+    ];
 
     public function client()
     {
@@ -29,5 +40,10 @@ class Quote extends Model
     public function invoice()
     {
         return $this->hasOne(Invoice::class);
+    }
+
+    public function getIsExpiredAttribute()
+    {
+        return $this->valid_until && $this->valid_until->isPast() && $this->status === 'envoye';
     }
 }
