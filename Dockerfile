@@ -42,10 +42,10 @@ RUN mkdir -p /var/www/html/storage/framework/{sessions,views,cache} \
     && chown -R www-data:www-data /var/www/html/bootstrap/cache
 
 RUN printf '#!/bin/sh\n\
+php artisan migrate --force --seed\n\
 php artisan config:cache\n\
 php artisan route:cache\n\
 php artisan view:cache\n\
-php artisan migrate --force\n\
 php-fpm -D\n\
 nginx -g "daemon off;"\n' > /usr/local/bin/start.sh \
     && chmod +x /usr/local/bin/start.sh
