@@ -51,7 +51,8 @@ const handleLogout = () => {
 </script>
 
 <template>
-    <div class="min-h-screen bg-[#ecfeff] text-[#0f172a]">
+    <div class="min-h-screen text-[#0f172a]"
+         style="background: linear-gradient(180deg, #ecfeff 0%, #ffffff 400px, #f8fafc 100%); min-height: 100vh;">
 
         <header class="sticky top-0 z-50 shadow-md"
                 style="background: linear-gradient(135deg, #1e3a8a 0%, #22d3ee 50%, #10b981 100%);">
