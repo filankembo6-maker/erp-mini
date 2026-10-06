@@ -1,173 +1,211 @@
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue';
-import Dropdown from '@/Components/Dropdown.vue';
-import DropdownLink from '@/Components/DropdownLink.vue';
-import { Link, usePage } from '@inertiajs/vue3';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import WelcomeSplash from '@/Components/WelcomeSplash.vue';
+import { Head, Link } from '@inertiajs/vue3';
+import { ref, onMounted } from 'vue';
+import { formatCFA } from '@/Utils/format';
 
-const page = usePage();
-const user = computed(() => page.props.auth?.user ?? { name: '', email: '' });
+const props = defineProps({
+    stats: Object,
+    low_stock: Array,
+    recent_quotes: Array,
+    recent_invoices: Array,
+    activity: Array,
+});
 
-const now = ref(new Date());
-let clockInterval = null;
+const showSplash = ref(false);
 
 onMounted(() => {
-    clockInterval = setInterval(() => { now.value = new Date(); }, 30000);
+    if (!sessionStorage.getItem('splash_seen')) {
+        showSplash.value = true;
+        sessionStorage.setItem('splash_seen', '1');
+    }
 });
 
-onUnmounted(() => {
-    if (clockInterval) clearInterval(clockInterval);
-});
+const onSplashFinished = () => { showSplash.value = false; };
 
-const dateStr = computed(() => now.value.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }));
-const timeStr = computed(() => now.value.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }));
-
-const menuItems = [
-    { name: 'Dashboard', route: 'dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
-    { name: 'Produits', route: 'products.index', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' },
-    { name: 'Clients', route: 'clients.index', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z' },
-    { name: 'Stocks', route: 'stock-movements.index', icon: 'M4 6h16M4 12h16M4 18h10' },
-    { name: 'Devis', route: 'quotes.index', icon: 'M7 3h8l4 4v14H7a2 2 0 01-2-2V5a2 2 0 012-2zm8 0v5h5M9 12h6M9 16h6' },
-    { name: 'Factures', route: 'invoices.index', icon: 'M7 3h10a2 2 0 012 2v16l-3-2-4 2-4-2-3 2V5a2 2 0 012-2zm3 5h4m-4 4h5m-5 4h3' },
+const cards = [
+    { label: 'Produits au catalogue', key: 'products', href: 'products.index', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' },
+    { label: 'Clients actifs', key: 'clients', href: 'clients.index', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z' },
+    { label: 'Devis en attente', key: 'quotes_pending', href: 'quotes.index', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
+    { label: 'Factures impayées', key: 'invoices_unpaid', href: 'invoices.index', icon: 'M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z' },
 ];
 
-const isActive = (itemRoute) => {
-    const current = page.url;
-    const base = '/' + itemRoute.split('.')[0];
-    return current === base || current.startsWith(base + '/');
-};
-
-const initials = computed(() => {
-    const name = String(user.value.name || '').trim();
-    if (!name) return 'U';
-    return name.split(/\s+/).slice(0, 2).map(p => p.charAt(0).toUpperCase()).join('');
-});
-
-const handleLogout = () => {
-    sessionStorage.removeItem('splash_seen');
-};
+const formatDate = (date) => new Date(date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 </script>
 
 <template>
-    <div class="min-h-screen bg-[#f0fdfa] text-[#0f172a]">
+    <Head title="Dashboard" />
 
-        <!-- HEADER avec dégradé turquoise -->
-        <header class="sticky top-0 z-50"
-                style="background: linear-gradient(135deg, #1e40af 0%, #14b8a6 100%);">
+    <WelcomeSplash v-if="showSplash" @finished="onSplashFinished" />
 
-            <div class="max-w-[1500px] mx-auto px-5 lg:px-8">
+    <AuthenticatedLayout>
+        <div class="max-w-[1400px] mx-auto">
 
-                <div class="h-[72px] flex items-center gap-4">
-
-                    <!-- LOGO -->
-                    <Link :href="route('dashboard')" class="flex items-center gap-3 shrink-0">
-                        <div class="w-11 h-11 rounded-[14px] bg-white flex items-center justify-center p-2 shadow-lg">
-                            <img src="/images/logo-icon.png" alt="BISALELI TECH" class="w-full h-full object-contain" />
+            <!-- En-tête -->
+            <div class="mb-8 pb-6 border-b border-[#14b8a6]/25">
+                <div class="flex flex-wrap items-end justify-between gap-4">
+                    <div>
+                        <div class="text-[10px] font-semibold tracking-[0.2em] uppercase text-[#14b8a6]">
+                            Cockpit
                         </div>
-                        <div class="hidden sm:block">
-                            <div class="text-[14px] font-semibold text-white tracking-[-0.01em]">
-                                BISALELI TECH
-                            </div>
-                            <div class="text-[10px] text-white/80 mt-0.5 font-medium">
-                                Gestion commerciale
-                            </div>
-                        </div>
-                    </Link>
-
-                    <div class="hidden lg:block w-px h-8 bg-white/25 mx-1"></div>
-
-                    <!-- NAVIGATION -->
-                    <nav class="hidden md:flex items-center gap-1 flex-1 min-w-0">
-
-                        <Link
-                            v-for="item in menuItems"
-                            :key="item.route"
-                            :href="route(item.route)"
-                            class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-[13px] whitespace-nowrap transition-all duration-200"
-                            :class="
-                                isActive(item.route)
-                                    ? 'bg-white text-[#0f172a] font-semibold shadow-md'
-                                    : 'text-white/85 hover:bg-white/15 hover:text-white'
-                            "
-                        >
-                            <svg class="w-[16px] h-[16px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.7">
-                                <path stroke-linecap="round" stroke-linejoin="round" :d="item.icon" />
-                            </svg>
-                            {{ item.name }}
-                        </Link>
-
-                    </nav>
-
-                    <!-- INFOS DROITE -->
-                    <div class="ml-auto flex items-center gap-2 sm:gap-3 shrink-0">
-
-                        <div class="hidden xl:block text-right mr-1">
-                            <div class="text-[11px] text-white/70">{{ dateStr }}</div>
-                            <div class="text-[13px] font-semibold text-white mt-0.5">{{ timeStr }}</div>
-                        </div>
-
-                        <button type="button" aria-label="Notifications"
-                                class="relative w-10 h-10 rounded-xl border border-white/30 bg-white/10 hover:bg-white/20 text-white transition-all duration-200">
-                            <svg class="w-[17px] h-[17px] mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.7">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                            </svg>
-                            <span class="absolute top-[8px] right-[8px] w-1.5 h-1.5 rounded-full bg-white ring-2 ring-[#14b8a6]"></span>
-                        </button>
-
-                        <Dropdown align="right" width="52">
-                            <template #trigger>
-                                <button class="flex items-center gap-2 pl-1 pr-2 sm:pr-2.5 py-1 rounded-xl bg-white/10 hover:bg-white/20 transition-colors duration-200">
-                                    <div class="w-9 h-9 rounded-[12px] bg-white text-[#14b8a6] flex items-center justify-center text-[11px] font-semibold">
-                                        {{ initials }}
-                                    </div>
-                                    <div class="hidden sm:block text-left max-w-[120px]">
-                                        <div class="truncate text-[12px] font-semibold text-white">{{ user.name }}</div>
-                                        <div class="truncate text-[10px] text-white/70 mt-0.5">Administrateur</div>
-                                    </div>
-                                    <svg class="w-3.5 h-3.5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </button>
-                            </template>
-                            <template #content>
-                                <DropdownLink :href="route('profile.edit')">Mon profil</DropdownLink>
-                                <DropdownLink :href="route('logout')" method="post" as="button" @click="handleLogout">Déconnexion</DropdownLink>
-                            </template>
-                        </Dropdown>
+                        <h1 class="text-[28px] font-semibold text-[#0f172a] tracking-[-0.01em] mt-2">
+                            Tableau de bord
+                        </h1>
+                        <p class="text-[13px] text-[#0f172a]/60 mt-1">
+                            Synthèse de l'activité commerciale
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2 text-[11px] text-[#0f172a]/60">
+                        <span class="w-1.5 h-1.5 bg-[#14b8a6] rounded-full"></span>
+                        <span>Données actualisées à l'instant</span>
                     </div>
                 </div>
+            </div>
 
-                <!-- NAVIGATION MOBILE -->
-                <div class="md:hidden border-t border-white/20 py-2 overflow-x-auto scrollbar-none">
-                    <nav class="flex items-center gap-1 min-w-max">
-                        <Link
-                            v-for="item in menuItems"
-                            :key="`mobile-${item.route}`"
-                            :href="route(item.route)"
-                            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] transition-colors"
-                            :class="
-                                isActive(item.route)
-                                    ? 'bg-white text-[#0f172a] font-semibold'
-                                    : 'text-white/85 hover:bg-white/15'
-                            "
-                        >
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.7">
-                                <path stroke-linecap="round" stroke-linejoin="round" :d="item.icon" />
+            <!-- Cartes statistiques -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <Link v-for="(card, i) in cards" :key="i"
+                      :href="route(card.href)"
+                      class="bg-white border border-[#14b8a6]/20 rounded-2xl p-6 hover:border-[#14b8a6] hover:shadow-lg hover:shadow-[#14b8a6]/10 transition-all group">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="w-11 h-11 rounded-xl bg-[#14b8a6] flex items-center justify-center shadow-sm">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" :d="card.icon" />
                             </svg>
-                            {{ item.name }}
-                        </Link>
-                    </nav>
+                        </div>
+                        <svg class="w-4 h-4 text-[#14b8a6] opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                    </div>
+                    <div class="text-[36px] font-semibold text-[#0f172a] tabular-nums leading-none tracking-[-0.02em]">
+                        {{ stats[card.key] }}
+                    </div>
+                    <div class="text-[10px] text-[#0f172a]/60 uppercase tracking-[0.14em] font-semibold mt-3">
+                        {{ card.label }}
+                    </div>
+                </Link>
+            </div>
+
+            <!-- Grille principale -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+                <div class="lg:col-span-2 space-y-5">
+
+                    <!-- Alertes de stock -->
+                    <div class="bg-white border border-[#14b8a6]/20 rounded-2xl overflow-hidden">
+                        <div class="flex items-center justify-between px-6 py-5 border-b border-[#14b8a6]/15 bg-gradient-to-r from-[#14b8a6]/10 to-transparent">
+                            <div>
+                                <h2 class="text-[14px] font-semibold text-[#0f172a]">Alertes de stock</h2>
+                                <p class="text-[11px] text-[#0f172a]/60 mt-0.5">Produits sous le seuil de réapprovisionnement</p>
+                            </div>
+                            <Link :href="route('products.index')" class="text-[10px] uppercase tracking-[0.16em] font-semibold text-[#14b8a6] hover:text-[#0f172a] transition-colors">
+                                Consulter
+                            </Link>
+                        </div>
+
+                        <div v-if="low_stock.length === 0" class="px-6 py-12 text-center">
+                            <p class="text-[13px] text-[#0f172a]/60">Aucune alerte. Tous les stocks sont conformes.</p>
+                        </div>
+
+                        <div v-else class="divide-y divide-[#14b8a6]/10">
+                            <Link v-for="product in low_stock" :key="product.id"
+                                  :href="route('products.show', product.id)"
+                                  class="flex items-center justify-between px-6 py-4 hover:bg-[#14b8a6]/5 transition-colors">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-1 h-10 rounded-full bg-[#14b8a6]"></div>
+                                    <div>
+                                        <div class="text-[13px] font-medium text-[#0f172a]">{{ product.name }}</div>
+                                        <div class="text-[11px] text-[#0f172a]/60 font-mono mt-0.5">{{ product.sku }}</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-[14px] font-semibold text-[#14b8a6] tabular-nums">{{ product.stock_quantity }}</div>
+                                    <div class="text-[10px] text-[#0f172a]/60 uppercase tracking-[0.12em] mt-0.5">seuil {{ product.stock_alert }}</div>
+                                </div>
+                            </Link>
+                        </div>
+                    </div>
+
+                    <!-- Devis récents -->
+                    <div class="bg-white border border-[#14b8a6]/20 rounded-2xl overflow-hidden">
+                        <div class="flex items-center justify-between px-6 py-5 border-b border-[#14b8a6]/15 bg-gradient-to-r from-[#14b8a6]/10 to-transparent">
+                            <div>
+                                <h2 class="text-[14px] font-semibold text-[#0f172a]">Devis récents</h2>
+                                <p class="text-[11px] text-[#0f172a]/60 mt-0.5">Dernières propositions commerciales</p>
+                            </div>
+                            <Link :href="route('quotes.index')" class="text-[10px] uppercase tracking-[0.16em] font-semibold text-[#14b8a6] hover:text-[#0f172a] transition-colors">
+                                Consulter
+                            </Link>
+                        </div>
+
+                        <div v-if="recent_quotes.length === 0" class="px-6 py-12 text-center">
+                            <p class="text-[13px] text-[#0f172a]/60">Aucun devis enregistré.</p>
+                        </div>
+
+                        <div v-else class="divide-y divide-[#14b8a6]/10">
+                            <Link v-for="quote in recent_quotes" :key="quote.id"
+                                  :href="route('quotes.show', quote.id)"
+                                  class="flex items-center justify-between px-6 py-4 hover:bg-[#14b8a6]/5 transition-colors">
+                                <div>
+                                    <div class="text-[13px] font-semibold text-[#0f172a] font-mono">{{ quote.reference }}</div>
+                                    <div class="text-[11px] text-[#0f172a]/60 mt-0.5">{{ quote.client?.name }} · {{ formatDate(quote.created_at) }}</div>
+                                </div>
+                                <div class="text-[14px] font-semibold text-[#0f172a] tabular-nums">{{ formatCFA(quote.total_amount) }}</div>
+                            </Link>
+                        </div>
+                    </div>
+
                 </div>
 
+                <div class="space-y-5">
+
+                    <!-- Bloc en attente turquoise -->
+                    <div class="rounded-2xl p-6 text-white shadow-lg shadow-[#14b8a6]/30 bg-gradient-to-br from-[#14b8a6] to-[#0d9488]">
+                        <div class="text-[10px] uppercase tracking-[0.2em] text-white/80 font-semibold">En attente</div>
+                        <div class="text-[11px] text-white/70 mt-1">Devis non convertis</div>
+                        <div class="text-[28px] font-semibold tabular-nums mt-4 tracking-[-0.01em]">
+                            {{ formatCFA(stats.quotes_pending_amount) }}
+                        </div>
+                        <div class="text-[12px] text-white/85 mt-2">
+                            {{ stats.quotes_pending }} document<span v-if="stats.quotes_pending > 1">s</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-[#14b8a6]/20 rounded-2xl p-6">
+                        <div class="text-[10px] uppercase tracking-[0.2em] text-[#14b8a6] font-semibold">À encaisser</div>
+                        <div class="text-[11px] text-[#0f172a]/60 mt-1">Factures impayées</div>
+                        <div class="text-[28px] font-semibold text-[#0f172a] tabular-nums mt-4 tracking-[-0.01em]">
+                            {{ formatCFA(stats.invoices_unpaid_amount) }}
+                        </div>
+                        <div class="text-[12px] text-[#0f172a]/60 mt-2">
+                            {{ stats.invoices_unpaid }} facture<span v-if="stats.invoices_unpaid > 1">s</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-[#14b8a6]/20 rounded-2xl overflow-hidden">
+                        <div class="px-6 py-5 border-b border-[#14b8a6]/15 bg-gradient-to-r from-[#14b8a6]/10 to-transparent">
+                            <h2 class="text-[14px] font-semibold text-[#0f172a]">Activité récente</h2>
+                        </div>
+
+                        <div v-if="activity.length === 0" class="px-6 py-10 text-center">
+                            <p class="text-[13px] text-[#0f172a]/60">Aucun événement.</p>
+                        </div>
+
+                        <div v-else class="divide-y divide-[#14b8a6]/10">
+                            <div v-for="(item, i) in activity" :key="i" class="px-6 py-4">
+                                <div class="text-[12px] text-[#0f172a] leading-relaxed">{{ item.description }}</div>
+                                <div class="text-[10px] text-[#0f172a]/60 uppercase tracking-[0.12em] mt-2">
+                                    {{ item.user }} · {{ formatDateTime(item.created_at) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
-        </header>
 
-        <main class="max-w-[1500px] mx-auto px-5 lg:px-8 py-7 lg:py-9">
-            <slot />
-        </main>
-    </div>
+        </div>
+    </AuthenticatedLayout>
 </template>
-
-<style scoped>
-.scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
-.scrollbar-none::-webkit-scrollbar { display: none; }
-</style>
