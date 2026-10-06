@@ -41,13 +41,8 @@ const userName = computed(() => {
     return u && u.name ? u.name : 'Utilisateur';
 });
 
-const userRole = computed(() => {
-    return 'Administrateur';
-});
-
 const initials = computed(() => {
-    const name = userName.value;
-    return name
+    return userName.value
         .split(' ')
         .filter(Boolean)
         .slice(0, 2)
@@ -63,27 +58,29 @@ const handleLogout = () => {
 <template>
     <div class="min-h-screen bg-[#f0fdfa] text-[#0f172a]">
 
-        <header class="sticky top-0 z-50 bg-[#14b8a6] shadow-sm">
+        <!-- HEADER avec le dégradé de la carte de connexion -->
+        <header class="sticky top-0 z-50 shadow-md"
+                style="background: linear-gradient(135deg, #1e3a8a 0%, #22d3ee 50%, #10b981 100%);">
 
             <div class="max-w-[1500px] mx-auto px-5 lg:px-8">
 
                 <div class="h-[72px] flex items-center gap-4">
 
                     <Link :href="route('dashboard')" class="flex items-center gap-3 shrink-0">
-                        <div class="w-11 h-11 rounded-[14px] bg-white flex items-center justify-center p-2 shadow-md">
+                        <div class="w-11 h-11 rounded-full bg-white flex items-center justify-center p-2 shadow-lg">
                             <img src="/images/logo-icon.png" alt="BISALELI TECH" class="w-full h-full object-contain" />
                         </div>
                         <div class="hidden sm:block">
-                            <div class="text-[14px] font-semibold text-white tracking-[-0.01em]">
+                            <div class="text-[14px] font-bold text-white tracking-[-0.01em] drop-shadow-sm">
                                 BISALELI TECH
                             </div>
-                            <div class="text-[10px] text-white/80 mt-0.5 font-medium">
-                                Gestion commerciale
+                            <div class="text-[10px] text-white/85 mt-0.5 font-semibold tracking-wider">
+                                GESTION COMMERCIALE
                             </div>
                         </div>
                     </Link>
 
-                    <div class="hidden lg:block w-px h-8 bg-white/25 mx-1"></div>
+                    <div class="hidden lg:block w-px h-8 bg-white/30 mx-1"></div>
 
                     <nav class="hidden md:flex items-center gap-1 flex-1 min-w-0">
                         <Link
@@ -93,8 +90,8 @@ const handleLogout = () => {
                             class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-[13px] whitespace-nowrap transition-all duration-200"
                             :class="
                                 isActive(item.route)
-                                    ? 'bg-white text-[#14b8a6] font-semibold shadow-md'
-                                    : 'text-white/85 hover:bg-white/15 hover:text-white'
+                                    ? 'bg-white text-[#0f172a] font-semibold shadow-md'
+                                    : 'text-white/90 hover:bg-white/15 hover:text-white'
                             "
                         >
                             <svg class="w-[16px] h-[16px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.7">
@@ -107,29 +104,29 @@ const handleLogout = () => {
                     <div class="ml-auto flex items-center gap-2 sm:gap-3 shrink-0">
 
                         <div class="hidden xl:block text-right mr-1">
-                            <div class="text-[11px] text-white/70">{{ dateStr }}</div>
-                            <div class="text-[13px] font-semibold text-white mt-0.5">{{ timeStr }}</div>
+                            <div class="text-[11px] text-white/80">{{ dateStr }}</div>
+                            <div class="text-[13px] font-bold text-white mt-0.5">{{ timeStr }}</div>
                         </div>
 
                         <button type="button" aria-label="Notifications"
-                                class="relative w-10 h-10 rounded-xl border border-white/30 bg-white/10 hover:bg-white/20 text-white transition-all duration-200">
+                                class="relative w-10 h-10 rounded-xl border border-white/40 bg-white/15 hover:bg-white/25 text-white transition-all duration-200 backdrop-blur-sm">
                             <svg class="w-[17px] h-[17px] mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.7">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                             </svg>
-                            <span class="absolute top-[8px] right-[8px] w-1.5 h-1.5 rounded-full bg-white ring-2 ring-[#14b8a6]"></span>
+                            <span class="absolute top-[8px] right-[8px] w-2 h-2 rounded-full bg-[#10b981] ring-2 ring-white"></span>
                         </button>
 
                         <Dropdown align="right" width="52">
                             <template #trigger>
-                                <button class="flex items-center gap-2 pl-1 pr-2 sm:pr-2.5 py-1 rounded-xl bg-white/10 hover:bg-white/20 transition-colors duration-200">
-                                    <div class="w-9 h-9 rounded-[12px] bg-white text-[#14b8a6] flex items-center justify-center text-[11px] font-semibold">
+                                <button class="flex items-center gap-2 pl-1 pr-2 sm:pr-2.5 py-1 rounded-xl bg-white/15 hover:bg-white/25 transition-colors duration-200 backdrop-blur-sm border border-white/30">
+                                    <div class="w-9 h-9 rounded-full bg-white text-[#1e3a8a] flex items-center justify-center text-[12px] font-bold shadow-sm">
                                         {{ initials }}
                                     </div>
                                     <div class="hidden sm:block text-left max-w-[120px]">
                                         <div class="truncate text-[12px] font-semibold text-white">{{ userName }}</div>
-                                        <div class="truncate text-[10px] text-white/70 mt-0.5">{{ userRole }}</div>
+                                        <div class="truncate text-[10px] text-white/85 mt-0.5 font-medium">Administrateur</div>
                                     </div>
-                                    <svg class="w-3.5 h-3.5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                                    <svg class="w-3.5 h-3.5 text-white/85" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
@@ -142,7 +139,7 @@ const handleLogout = () => {
                     </div>
                 </div>
 
-                <div class="md:hidden border-t border-white/20 py-2 overflow-x-auto scrollbar-none">
+                <div class="md:hidden border-t border-white/25 py-2 overflow-x-auto scrollbar-none">
                     <nav class="flex items-center gap-1 min-w-max">
                         <Link
                             v-for="item in menuItems"
@@ -151,8 +148,8 @@ const handleLogout = () => {
                             class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] transition-colors"
                             :class="
                                 isActive(item.route)
-                                    ? 'bg-white text-[#14b8a6] font-semibold'
-                                    : 'text-white/85 hover:bg-white/15'
+                                    ? 'bg-white text-[#0f172a] font-semibold'
+                                    : 'text-white/90 hover:bg-white/15'
                             "
                         >
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.7">
