@@ -2,7 +2,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import WelcomeSplash from '@/Components/WelcomeSplash.vue';
 import { Head, Link } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { formatCFA } from '@/Utils/format';
 
 const props = defineProps({
@@ -13,7 +13,18 @@ const props = defineProps({
     activity: Array,
 });
 
-const showSplash = ref(true);
+const showSplash = ref(false);
+
+onMounted(() => {
+    if (!sessionStorage.getItem('splash_seen')) {
+        showSplash.value = true;
+        sessionStorage.setItem('splash_seen', '1');
+    }
+});
+
+const onSplashFinished = () => {
+    showSplash.value = false;
+};
 
 const cards = [
     { label: 'Produits', key: 'products', href: 'products.index', hint: 'au catalogue', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', color: 'text-blue-700 bg-blue-50' },
@@ -29,7 +40,7 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
 <template>
     <Head title="Dashboard" />
 
-    <WelcomeSplash v-if="showSplash" @finished="showSplash = false" />
+    <WelcomeSplash v-if="showSplash" @finished="onSplashFinished" />
 
     <AuthenticatedLayout>
         <div class="max-w-[1400px] mx-auto space-y-6">
