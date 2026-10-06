@@ -22,9 +22,7 @@ onMounted(() => {
     }
 });
 
-const onSplashFinished = () => {
-    showSplash.value = false;
-};
+const onSplashFinished = () => { showSplash.value = false; };
 
 const cards = [
     { label: 'Produits au catalogue', key: 'products', href: 'products.index', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' },
@@ -46,20 +44,20 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
         <div class="max-w-[1400px] mx-auto">
 
             <!-- En-tête -->
-            <div class="mb-8 pb-6 border-b border-white/10">
+            <div class="mb-8 pb-6 border-b border-[#14b8a6]/25">
                 <div class="flex flex-wrap items-end justify-between gap-4">
                     <div>
                         <div class="text-[10px] font-semibold tracking-[0.2em] uppercase text-[#14b8a6]">
                             Cockpit
                         </div>
-                        <h1 class="text-[28px] font-semibold text-white tracking-[-0.01em] mt-2">
+                        <h1 class="text-[28px] font-semibold text-[#0f172a] tracking-[-0.01em] mt-2">
                             Tableau de bord
                         </h1>
-                        <p class="text-[13px] text-white/50 mt-1">
+                        <p class="text-[13px] text-[#0f172a]/60 mt-1">
                             Synthèse de l'activité commerciale
                         </p>
                     </div>
-                    <div class="flex items-center gap-2 text-[11px] text-white/50">
+                    <div class="flex items-center gap-2 text-[11px] text-[#0f172a]/60">
                         <span class="w-1.5 h-1.5 bg-[#14b8a6] rounded-full"></span>
                         <span>Données actualisées à l'instant</span>
                     </div>
@@ -70,21 +68,21 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 <Link v-for="(card, i) in cards" :key="i"
                       :href="route(card.href)"
-                      class="bg-white rounded-2xl p-6 hover:bg-[#14b8a6] transition-all group">
+                      class="bg-white border border-[#14b8a6]/20 rounded-2xl p-6 hover:border-[#14b8a6] hover:shadow-lg hover:shadow-[#14b8a6]/10 transition-all group">
                     <div class="flex items-center justify-between mb-6">
-                        <div class="w-11 h-11 rounded-xl bg-[#14b8a6]/15 group-hover:bg-white/20 flex items-center justify-center transition-colors">
-                            <svg class="w-5 h-5 text-[#14b8a6] group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-[#14b8a6] to-[#0d9488] flex items-center justify-center shadow-sm">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
                                 <path stroke-linecap="round" stroke-linejoin="round" :d="card.icon" />
                             </svg>
                         </div>
-                        <svg class="w-4 h-4 text-[#14b8a6] group-hover:text-white opacity-0 group-hover:opacity-100 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <svg class="w-4 h-4 text-[#14b8a6] opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
                     </div>
-                    <div class="text-[36px] font-semibold text-[#0f172a] group-hover:text-white tabular-nums leading-none tracking-[-0.02em] transition-colors">
+                    <div class="text-[36px] font-semibold text-[#0f172a] tabular-nums leading-none tracking-[-0.02em]">
                         {{ stats[card.key] }}
                     </div>
-                    <div class="text-[10px] text-[#0f172a]/60 group-hover:text-white/80 uppercase tracking-[0.14em] font-semibold mt-3 transition-colors">
+                    <div class="text-[10px] text-[#0f172a]/60 uppercase tracking-[0.14em] font-semibold mt-3">
                         {{ card.label }}
                     </div>
                 </Link>
@@ -96,8 +94,8 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                 <div class="lg:col-span-2 space-y-5">
 
                     <!-- Alertes de stock -->
-                    <div class="bg-white rounded-2xl overflow-hidden">
-                        <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100">
+                    <div class="bg-white border border-[#14b8a6]/20 rounded-2xl overflow-hidden">
+                        <div class="flex items-center justify-between px-6 py-5 border-b border-[#14b8a6]/15 bg-gradient-to-r from-[#14b8a6]/10 to-transparent">
                             <div>
                                 <h2 class="text-[14px] font-semibold text-[#0f172a]">Alertes de stock</h2>
                                 <p class="text-[11px] text-[#0f172a]/60 mt-0.5">Produits sous le seuil de réapprovisionnement</p>
@@ -111,7 +109,7 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                             <p class="text-[13px] text-[#0f172a]/60">Aucune alerte. Tous les stocks sont conformes.</p>
                         </div>
 
-                        <div v-else class="divide-y divide-slate-100">
+                        <div v-else class="divide-y divide-[#14b8a6]/10">
                             <Link v-for="product in low_stock" :key="product.id"
                                   :href="route('products.show', product.id)"
                                   class="flex items-center justify-between px-6 py-4 hover:bg-[#14b8a6]/5 transition-colors">
@@ -123,20 +121,16 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                                     </div>
                                 </div>
                                 <div class="text-right">
-                                    <div class="text-[14px] font-semibold text-[#14b8a6] tabular-nums">
-                                        {{ product.stock_quantity }}
-                                    </div>
-                                    <div class="text-[10px] text-[#0f172a]/60 uppercase tracking-[0.12em] mt-0.5">
-                                        seuil {{ product.stock_alert }}
-                                    </div>
+                                    <div class="text-[14px] font-semibold text-[#14b8a6] tabular-nums">{{ product.stock_quantity }}</div>
+                                    <div class="text-[10px] text-[#0f172a]/60 uppercase tracking-[0.12em] mt-0.5">seuil {{ product.stock_alert }}</div>
                                 </div>
                             </Link>
                         </div>
                     </div>
 
                     <!-- Devis récents -->
-                    <div class="bg-white rounded-2xl overflow-hidden">
-                        <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100">
+                    <div class="bg-white border border-[#14b8a6]/20 rounded-2xl overflow-hidden">
+                        <div class="flex items-center justify-between px-6 py-5 border-b border-[#14b8a6]/15 bg-gradient-to-r from-[#14b8a6]/10 to-transparent">
                             <div>
                                 <h2 class="text-[14px] font-semibold text-[#0f172a]">Devis récents</h2>
                                 <p class="text-[11px] text-[#0f172a]/60 mt-0.5">Dernières propositions commerciales</p>
@@ -150,7 +144,7 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                             <p class="text-[13px] text-[#0f172a]/60">Aucun devis enregistré.</p>
                         </div>
 
-                        <div v-else class="divide-y divide-slate-100">
+                        <div v-else class="divide-y divide-[#14b8a6]/10">
                             <Link v-for="quote in recent_quotes" :key="quote.id"
                                   :href="route('quotes.show', quote.id)"
                                   class="flex items-center justify-between px-6 py-4 hover:bg-[#14b8a6]/5 transition-colors">
@@ -158,9 +152,7 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                                     <div class="text-[13px] font-semibold text-[#0f172a] font-mono">{{ quote.reference }}</div>
                                     <div class="text-[11px] text-[#0f172a]/60 mt-0.5">{{ quote.client?.name }} · {{ formatDate(quote.created_at) }}</div>
                                 </div>
-                                <div class="text-[14px] font-semibold text-[#0f172a] tabular-nums">
-                                    {{ formatCFA(quote.total_amount) }}
-                                </div>
+                                <div class="text-[14px] font-semibold text-[#0f172a] tabular-nums">{{ formatCFA(quote.total_amount) }}</div>
                             </Link>
                         </div>
                     </div>
@@ -169,23 +161,21 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
 
                 <div class="space-y-5">
 
-                    <div class="bg-[#14b8a6] text-white p-6 rounded-2xl">
-                        <div class="text-[10px] uppercase tracking-[0.2em] text-white/80 font-semibold">
-                            En attente
-                        </div>
+                    <!-- Bloc en attente avec dégradé -->
+                    <div class="rounded-2xl p-6 text-white shadow-lg shadow-[#14b8a6]/20"
+                         style="background: linear-gradient(135deg, #1e40af 0%, #14b8a6 100%);">
+                        <div class="text-[10px] uppercase tracking-[0.2em] text-white/80 font-semibold">En attente</div>
                         <div class="text-[11px] text-white/70 mt-1">Devis non convertis</div>
                         <div class="text-[28px] font-semibold tabular-nums mt-4 tracking-[-0.01em]">
                             {{ formatCFA(stats.quotes_pending_amount) }}
                         </div>
-                        <div class="text-[12px] text-white/80 mt-2">
+                        <div class="text-[12px] text-white/85 mt-2">
                             {{ stats.quotes_pending }} document<span v-if="stats.quotes_pending > 1">s</span>
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-2xl p-6">
-                        <div class="text-[10px] uppercase tracking-[0.2em] text-[#14b8a6] font-semibold">
-                            À encaisser
-                        </div>
+                    <div class="bg-white border border-[#14b8a6]/20 rounded-2xl p-6">
+                        <div class="text-[10px] uppercase tracking-[0.2em] text-[#14b8a6] font-semibold">À encaisser</div>
                         <div class="text-[11px] text-[#0f172a]/60 mt-1">Factures impayées</div>
                         <div class="text-[28px] font-semibold text-[#0f172a] tabular-nums mt-4 tracking-[-0.01em]">
                             {{ formatCFA(stats.invoices_unpaid_amount) }}
@@ -195,8 +185,8 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-2xl overflow-hidden">
-                        <div class="px-6 py-5 border-b border-slate-100">
+                    <div class="bg-white border border-[#14b8a6]/20 rounded-2xl overflow-hidden">
+                        <div class="px-6 py-5 border-b border-[#14b8a6]/15 bg-gradient-to-r from-[#14b8a6]/10 to-transparent">
                             <h2 class="text-[14px] font-semibold text-[#0f172a]">Activité récente</h2>
                         </div>
 
@@ -204,7 +194,7 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                             <p class="text-[13px] text-[#0f172a]/60">Aucun événement.</p>
                         </div>
 
-                        <div v-else class="divide-y divide-slate-100">
+                        <div v-else class="divide-y divide-[#14b8a6]/10">
                             <div v-for="(item, i) in activity" :key="i" class="px-6 py-4">
                                 <div class="text-[12px] text-[#0f172a] leading-relaxed">{{ item.description }}</div>
                                 <div class="text-[10px] text-[#0f172a]/60 uppercase tracking-[0.12em] mt-2">
