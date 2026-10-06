@@ -46,20 +46,20 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
         <div class="max-w-[1400px] mx-auto">
 
             <!-- En-tête -->
-            <div class="mb-8 pb-6 border-b border-[#e0f2fe]">
+            <div class="mb-8 pb-6 border-b border-[#14b8a6]/20">
                 <div class="flex flex-wrap items-end justify-between gap-4">
                     <div>
                         <div class="text-[10px] font-semibold tracking-[0.2em] uppercase text-[#14b8a6]">
                             Cockpit
                         </div>
-                        <h1 class="text-[28px] font-semibold text-[#0d3b66] tracking-[-0.01em] mt-2">
+                        <h1 class="text-[28px] font-semibold text-[#0f172a] tracking-[-0.01em] mt-2">
                             Tableau de bord
                         </h1>
-                        <p class="text-[13px] text-[#64748b] mt-1">
+                        <p class="text-[13px] text-[#0f172a]/60 mt-1">
                             Synthèse de l'activité commerciale
                         </p>
                     </div>
-                    <div class="flex items-center gap-2 text-[11px] text-[#64748b]">
+                    <div class="flex items-center gap-2 text-[11px] text-[#0f172a]/60">
                         <span class="w-1.5 h-1.5 bg-[#14b8a6] rounded-full"></span>
                         <span>Données actualisées à l'instant</span>
                     </div>
@@ -67,12 +67,12 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
             </div>
 
             <!-- Cartes statistiques -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-[#e0f2fe] border border-[#e0f2fe] rounded-2xl overflow-hidden mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-[#14b8a6]/20 border border-[#14b8a6]/20 rounded-2xl overflow-hidden mb-8">
                 <Link v-for="(card, i) in cards" :key="i"
                       :href="route(card.href)"
-                      class="bg-white p-6 hover:bg-[#f0f9ff] transition-colors group">
+                      class="bg-white p-6 hover:bg-[#14b8a6]/5 transition-colors group">
                     <div class="flex items-center justify-between mb-6">
-                        <div class="w-10 h-10 rounded-xl bg-[#f0f9ff] border border-[#e0f2fe] flex items-center justify-center">
+                        <div class="w-10 h-10 rounded-xl bg-[#14b8a6]/10 border border-[#14b8a6]/25 flex items-center justify-center">
                             <svg class="w-4 h-4 text-[#14b8a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.7">
                                 <path stroke-linecap="round" stroke-linejoin="round" :d="card.icon" />
                             </svg>
@@ -81,10 +81,10 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                             <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
                     </div>
-                    <div class="text-[32px] font-semibold text-[#0d3b66] tabular-nums leading-none tracking-[-0.02em]">
+                    <div class="text-[32px] font-semibold text-[#0f172a] tabular-nums leading-none tracking-[-0.02em]">
                         {{ stats[card.key] }}
                     </div>
-                    <div class="text-[10px] text-[#64748b] uppercase tracking-[0.14em] font-semibold mt-3">
+                    <div class="text-[10px] text-[#0f172a]/60 uppercase tracking-[0.14em] font-semibold mt-3">
                         {{ card.label }}
                     </div>
                 </Link>
@@ -95,40 +95,38 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
 
                 <div class="lg:col-span-2 space-y-6">
 
-                    <!-- Produits en alerte -->
-                    <div class="bg-white border border-[#e0f2fe] rounded-2xl overflow-hidden">
-                        <div class="flex items-center justify-between px-6 py-5 border-b border-[#e0f2fe]">
+                    <!-- Alertes de stock -->
+                    <div class="bg-white border border-[#14b8a6]/20 rounded-2xl overflow-hidden">
+                        <div class="flex items-center justify-between px-6 py-5 border-b border-[#14b8a6]/20">
                             <div>
-                                <h2 class="text-[14px] font-semibold text-[#0d3b66]">Alertes de stock</h2>
-                                <p class="text-[11px] text-[#64748b] mt-0.5">Produits sous le seuil de réapprovisionnement</p>
+                                <h2 class="text-[14px] font-semibold text-[#0f172a]">Alertes de stock</h2>
+                                <p class="text-[11px] text-[#0f172a]/60 mt-0.5">Produits sous le seuil de réapprovisionnement</p>
                             </div>
-                            <Link :href="route('products.index')" class="text-[10px] uppercase tracking-[0.16em] font-semibold text-[#14b8a6] hover:text-[#0d3b66] transition-colors">
+                            <Link :href="route('products.index')" class="text-[10px] uppercase tracking-[0.16em] font-semibold text-[#14b8a6] hover:text-[#0f172a] transition-colors">
                                 Consulter
                             </Link>
                         </div>
 
                         <div v-if="low_stock.length === 0" class="px-6 py-12 text-center">
-                            <p class="text-[13px] text-[#64748b]">Aucune alerte. Tous les stocks sont conformes.</p>
+                            <p class="text-[13px] text-[#0f172a]/60">Aucune alerte. Tous les stocks sont conformes.</p>
                         </div>
 
-                        <div v-else class="divide-y divide-[#f0f9ff]">
+                        <div v-else class="divide-y divide-[#14b8a6]/10">
                             <Link v-for="product in low_stock" :key="product.id"
                                   :href="route('products.show', product.id)"
-                                  class="flex items-center justify-between px-6 py-4 hover:bg-[#f0f9ff] transition-colors">
+                                  class="flex items-center justify-between px-6 py-4 hover:bg-[#14b8a6]/5 transition-colors">
                                 <div class="flex items-center gap-4">
-                                    <div class="w-1 h-10 rounded-full"
-                                         :class="product.stock_quantity === 0 ? 'bg-red-500' : 'bg-[#14b8a6]'"></div>
+                                    <div class="w-1 h-10 rounded-full bg-[#14b8a6]"></div>
                                     <div>
-                                        <div class="text-[13px] font-medium text-[#0d3b66]">{{ product.name }}</div>
-                                        <div class="text-[11px] text-[#64748b] font-mono mt-0.5">{{ product.sku }}</div>
+                                        <div class="text-[13px] font-medium text-[#0f172a]">{{ product.name }}</div>
+                                        <div class="text-[11px] text-[#0f172a]/60 font-mono mt-0.5">{{ product.sku }}</div>
                                     </div>
                                 </div>
                                 <div class="text-right">
-                                    <div class="text-[14px] font-semibold tabular-nums"
-                                         :class="product.stock_quantity === 0 ? 'text-red-500' : 'text-[#14b8a6]'">
+                                    <div class="text-[14px] font-semibold text-[#14b8a6] tabular-nums">
                                         {{ product.stock_quantity }}
                                     </div>
-                                    <div class="text-[10px] text-[#64748b] uppercase tracking-[0.12em] mt-0.5">
+                                    <div class="text-[10px] text-[#0f172a]/60 uppercase tracking-[0.12em] mt-0.5">
                                         seuil {{ product.stock_alert }}
                                     </div>
                                 </div>
@@ -137,30 +135,30 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                     </div>
 
                     <!-- Devis récents -->
-                    <div class="bg-white border border-[#e0f2fe] rounded-2xl overflow-hidden">
-                        <div class="flex items-center justify-between px-6 py-5 border-b border-[#e0f2fe]">
+                    <div class="bg-white border border-[#14b8a6]/20 rounded-2xl overflow-hidden">
+                        <div class="flex items-center justify-between px-6 py-5 border-b border-[#14b8a6]/20">
                             <div>
-                                <h2 class="text-[14px] font-semibold text-[#0d3b66]">Devis récents</h2>
-                                <p class="text-[11px] text-[#64748b] mt-0.5">Dernières propositions commerciales</p>
+                                <h2 class="text-[14px] font-semibold text-[#0f172a]">Devis récents</h2>
+                                <p class="text-[11px] text-[#0f172a]/60 mt-0.5">Dernières propositions commerciales</p>
                             </div>
-                            <Link :href="route('quotes.index')" class="text-[10px] uppercase tracking-[0.16em] font-semibold text-[#14b8a6] hover:text-[#0d3b66] transition-colors">
+                            <Link :href="route('quotes.index')" class="text-[10px] uppercase tracking-[0.16em] font-semibold text-[#14b8a6] hover:text-[#0f172a] transition-colors">
                                 Consulter
                             </Link>
                         </div>
 
                         <div v-if="recent_quotes.length === 0" class="px-6 py-12 text-center">
-                            <p class="text-[13px] text-[#64748b]">Aucun devis enregistré.</p>
+                            <p class="text-[13px] text-[#0f172a]/60">Aucun devis enregistré.</p>
                         </div>
 
-                        <div v-else class="divide-y divide-[#f0f9ff]">
+                        <div v-else class="divide-y divide-[#14b8a6]/10">
                             <Link v-for="quote in recent_quotes" :key="quote.id"
                                   :href="route('quotes.show', quote.id)"
-                                  class="flex items-center justify-between px-6 py-4 hover:bg-[#f0f9ff] transition-colors">
+                                  class="flex items-center justify-between px-6 py-4 hover:bg-[#14b8a6]/5 transition-colors">
                                 <div>
-                                    <div class="text-[13px] font-semibold text-[#0d3b66] font-mono">{{ quote.reference }}</div>
-                                    <div class="text-[11px] text-[#64748b] mt-0.5">{{ quote.client?.name }} · {{ formatDate(quote.created_at) }}</div>
+                                    <div class="text-[13px] font-semibold text-[#0f172a] font-mono">{{ quote.reference }}</div>
+                                    <div class="text-[11px] text-[#0f172a]/60 mt-0.5">{{ quote.client?.name }} · {{ formatDate(quote.created_at) }}</div>
                                 </div>
-                                <div class="text-[14px] font-semibold text-[#0d3b66] tabular-nums">
+                                <div class="text-[14px] font-semibold text-[#0f172a] tabular-nums">
                                     {{ formatCFA(quote.total_amount) }}
                                 </div>
                             </Link>
@@ -171,7 +169,7 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
 
                 <div class="space-y-6">
 
-                    <div class="bg-[#0d3b66] text-white p-6 rounded-2xl">
+                    <div class="bg-[#0f172a] text-white p-6 rounded-2xl">
                         <div class="text-[10px] uppercase tracking-[0.2em] text-[#14b8a6] font-semibold">
                             En attente
                         </div>
@@ -184,32 +182,32 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                         </div>
                     </div>
 
-                    <div class="bg-white border border-[#e0f2fe] p-6 rounded-2xl">
-                        <div class="text-[10px] uppercase tracking-[0.2em] text-red-500 font-semibold">
+                    <div class="bg-white border border-[#14b8a6]/20 p-6 rounded-2xl">
+                        <div class="text-[10px] uppercase tracking-[0.2em] text-[#14b8a6] font-semibold">
                             À encaisser
                         </div>
-                        <div class="text-[11px] text-[#64748b] mt-1">Factures impayées</div>
-                        <div class="text-[26px] font-semibold text-[#0d3b66] tabular-nums mt-4 tracking-[-0.01em]">
+                        <div class="text-[11px] text-[#0f172a]/60 mt-1">Factures impayées</div>
+                        <div class="text-[26px] font-semibold text-[#0f172a] tabular-nums mt-4 tracking-[-0.01em]">
                             {{ formatCFA(stats.invoices_unpaid_amount) }}
                         </div>
-                        <div class="text-[12px] text-[#64748b] mt-2">
+                        <div class="text-[12px] text-[#0f172a]/60 mt-2">
                             {{ stats.invoices_unpaid }} facture<span v-if="stats.invoices_unpaid > 1">s</span>
                         </div>
                     </div>
 
-                    <div class="bg-white border border-[#e0f2fe] rounded-2xl overflow-hidden">
-                        <div class="px-6 py-5 border-b border-[#e0f2fe]">
-                            <h2 class="text-[14px] font-semibold text-[#0d3b66]">Activité récente</h2>
+                    <div class="bg-white border border-[#14b8a6]/20 rounded-2xl overflow-hidden">
+                        <div class="px-6 py-5 border-b border-[#14b8a6]/20">
+                            <h2 class="text-[14px] font-semibold text-[#0f172a]">Activité récente</h2>
                         </div>
 
                         <div v-if="activity.length === 0" class="px-6 py-10 text-center">
-                            <p class="text-[13px] text-[#64748b]">Aucun événement.</p>
+                            <p class="text-[13px] text-[#0f172a]/60">Aucun événement.</p>
                         </div>
 
-                        <div v-else class="divide-y divide-[#f0f9ff]">
+                        <div v-else class="divide-y divide-[#14b8a6]/10">
                             <div v-for="(item, i) in activity" :key="i" class="px-6 py-4">
-                                <div class="text-[12px] text-[#0d3b66] leading-relaxed">{{ item.description }}</div>
-                                <div class="text-[10px] text-[#64748b] uppercase tracking-[0.12em] mt-2">
+                                <div class="text-[12px] text-[#0f172a] leading-relaxed">{{ item.description }}</div>
+                                <div class="text-[10px] text-[#0f172a]/60 uppercase tracking-[0.12em] mt-2">
                                     {{ item.user }} · {{ formatDateTime(item.created_at) }}
                                 </div>
                             </div>
