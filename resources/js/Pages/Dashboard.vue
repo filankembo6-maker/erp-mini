@@ -5,12 +5,12 @@ import { Head, Link } from '@inertiajs/vue3';
 import { ref, onMounted } from 'vue';
 import { formatCFA } from '@/Utils/format';
 
-const props = defineProps({
-    stats: Object,
-    low_stock: Array,
-    recent_quotes: Array,
-    recent_invoices: Array,
-    activity: Array,
+defineProps({
+    stats: { type: Object, default: () => ({}) },
+    low_stock: { type: Array, default: () => [] },
+    recent_quotes: { type: Array, default: () => [] },
+    recent_invoices: { type: Array, default: () => [] },
+    activity: { type: Array, default: () => [] },
 });
 
 const showSplash = ref(false);
@@ -43,7 +43,6 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
     <AuthenticatedLayout>
         <div class="max-w-[1400px] mx-auto">
 
-            <!-- En-tête -->
             <div class="mb-8 pb-6 border-b border-[#14b8a6]/25">
                 <div class="flex flex-wrap items-end justify-between gap-4">
                     <div>
@@ -64,13 +63,12 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                 </div>
             </div>
 
-            <!-- Cartes statistiques -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 <Link v-for="(card, i) in cards" :key="i"
                       :href="route(card.href)"
                       class="bg-white border border-[#14b8a6]/20 rounded-2xl p-6 hover:border-[#14b8a6] hover:shadow-lg hover:shadow-[#14b8a6]/10 transition-all group">
                     <div class="flex items-center justify-between mb-6">
-                        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-[#14b8a6] to-[#0d9488] flex items-center justify-center shadow-sm">
+                        <div class="w-11 h-11 rounded-xl bg-[#14b8a6] flex items-center justify-center shadow-sm">
                             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
                                 <path stroke-linecap="round" stroke-linejoin="round" :d="card.icon" />
                             </svg>
@@ -80,7 +78,7 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                         </svg>
                     </div>
                     <div class="text-[36px] font-semibold text-[#0f172a] tabular-nums leading-none tracking-[-0.02em]">
-                        {{ stats[card.key] }}
+                        {{ stats[card.key] ?? 0 }}
                     </div>
                     <div class="text-[10px] text-[#0f172a]/60 uppercase tracking-[0.14em] font-semibold mt-3">
                         {{ card.label }}
@@ -88,12 +86,10 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                 </Link>
             </div>
 
-            <!-- Grille principale -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
                 <div class="lg:col-span-2 space-y-5">
 
-                    <!-- Alertes de stock -->
                     <div class="bg-white border border-[#14b8a6]/20 rounded-2xl overflow-hidden">
                         <div class="flex items-center justify-between px-6 py-5 border-b border-[#14b8a6]/15 bg-gradient-to-r from-[#14b8a6]/10 to-transparent">
                             <div>
@@ -128,7 +124,6 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                         </div>
                     </div>
 
-                    <!-- Devis récents -->
                     <div class="bg-white border border-[#14b8a6]/20 rounded-2xl overflow-hidden">
                         <div class="flex items-center justify-between px-6 py-5 border-b border-[#14b8a6]/15 bg-gradient-to-r from-[#14b8a6]/10 to-transparent">
                             <div>
@@ -161,16 +156,14 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
 
                 <div class="space-y-5">
 
-                    <!-- Bloc en attente avec dégradé -->
-                    <div class="rounded-2xl p-6 text-white shadow-lg shadow-[#14b8a6]/20"
-                         style="background: linear-gradient(135deg, #1e40af 0%, #14b8a6 100%);">
+                    <div class="rounded-2xl p-6 text-white shadow-lg shadow-[#14b8a6]/30 bg-gradient-to-br from-[#14b8a6] to-[#0d9488]">
                         <div class="text-[10px] uppercase tracking-[0.2em] text-white/80 font-semibold">En attente</div>
                         <div class="text-[11px] text-white/70 mt-1">Devis non convertis</div>
                         <div class="text-[28px] font-semibold tabular-nums mt-4 tracking-[-0.01em]">
-                            {{ formatCFA(stats.quotes_pending_amount) }}
+                            {{ formatCFA(stats.quotes_pending_amount ?? 0) }}
                         </div>
                         <div class="text-[12px] text-white/85 mt-2">
-                            {{ stats.quotes_pending }} document<span v-if="stats.quotes_pending > 1">s</span>
+                            {{ stats.quotes_pending ?? 0 }} document<span v-if="(stats.quotes_pending ?? 0) > 1">s</span>
                         </div>
                     </div>
 
@@ -178,10 +171,10 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                         <div class="text-[10px] uppercase tracking-[0.2em] text-[#14b8a6] font-semibold">À encaisser</div>
                         <div class="text-[11px] text-[#0f172a]/60 mt-1">Factures impayées</div>
                         <div class="text-[28px] font-semibold text-[#0f172a] tabular-nums mt-4 tracking-[-0.01em]">
-                            {{ formatCFA(stats.invoices_unpaid_amount) }}
+                            {{ formatCFA(stats.invoices_unpaid_amount ?? 0) }}
                         </div>
                         <div class="text-[12px] text-[#0f172a]/60 mt-2">
-                            {{ stats.invoices_unpaid }} facture<span v-if="stats.invoices_unpaid > 1">s</span>
+                            {{ stats.invoices_unpaid ?? 0 }} facture<span v-if="(stats.invoices_unpaid ?? 0) > 1">s</span>
                         </div>
                     </div>
 
