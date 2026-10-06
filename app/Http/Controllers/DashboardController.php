@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Quote;
 use App\Models\Invoice;
 use App\Models\StockMovement;
+use Carbon\Carbon;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -31,7 +32,39 @@ class DashboardController extends Controller
         $pendingQuotes = Quote::whereIn('status', ['brouillon', 'envoye']);
         $unpaidInvoices = Invoice::where('status', 'impayee');
 
-        // Historique d'activité : on mélange les mouvements de stock et les dernières créations
+        $lateInvoices = Invoice::where('status', 'impayee')
+            ->where('created_at', '<=', Carbon::now()->subDays(30));
+
+        $revenueMonth = Invoice::where('status', 'payee')
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->whereYear('created_at', Carbon::now()->year)
+            ->sum('total_amount');
+
+        $lowStockCount = Product::whereColumn('stock_quantity', '<=', 'stock_alert')->count();
+        $lateInvoicesCount = $lateInvoices->count();
+
+        // Notifications : produits en alerte + factures en retard
+        $notifications = collect();
+
+        if ($lowStockCount > 0) {
+            $notifications->push([
+                'type' => 'stock',
+                'title' => $lowStockCount . ' produit(s) en alerte de stock',
+                'description' => 'Certains produits sont sous le seuil de réapprovisionnement.',
+                'href' => '/products',
+            ]);
+        }
+
+        if ($lateInvoicesCount > 0) {
+            $notifications->push([
+                'type' => 'invoice',
+                'title' => $lateInvoicesCount . ' facture(s) en retard',
+                'description' => 'Des factures impayées dépassent 30 jours.',
+                'href' => '/invoices',
+            ]);
+        }
+
+        // Historique d'activité
         $activity = collect();
 
         StockMovement::with(['product', 'user'])
@@ -84,7 +117,11 @@ class DashboardController extends Controller
                 'quotes_pending_amount' => $pendingQuotes->sum('total_amount'),
                 'invoices_unpaid' => $unpaidInvoices->count(),
                 'invoices_unpaid_amount' => $unpaidInvoices->sum('total_amount'),
+                'invoices_late' => $lateInvoicesCount,
+                'revenue_month' => $revenueMonth,
+                'low_stock_count' => $lowStockCount,
             ],
+            'notifications' => $notifications,
             'low_stock' => $lowStock,
             'recent_quotes' => $recentQuotes,
             'recent_invoices' => $recentInvoices,

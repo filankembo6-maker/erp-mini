@@ -45,6 +45,14 @@ const initials = computed(() => {
     return userName.value.split(' ').filter(Boolean).slice(0, 2).map(p => p[0].toUpperCase()).join('');
 });
 
+const notifications = computed(() => page.props?.notifications || []);
+const notificationsCount = computed(() => notifications.value.length);
+const showNotifications = ref(false);
+
+const toggleNotifications = () => {
+    showNotifications.value = !showNotifications.value;
+};
+
 const handleLogout = () => {
     sessionStorage.removeItem('splash_seen');
 };
@@ -56,7 +64,7 @@ const handleLogout = () => {
         <header class="sticky top-0 z-50 shadow-md"
                 style="background: linear-gradient(135deg, #1e3a8a 0%, #22d3ee 50%, #10b981 100%);">
 
-            <div class="max-w-[1500px] mx-auto px-5 lg:px-8">
+            <div class="mx-auto max-w-[1600px] px-5 lg:px-8">
 
                 <div class="h-[72px] flex items-center gap-4">
 
@@ -93,13 +101,59 @@ const handleLogout = () => {
                             <div class="text-[13px] font-bold text-white mt-0.5">{{ timeStr }}</div>
                         </div>
 
-                        <button type="button" aria-label="Notifications"
-                                class="relative w-10 h-10 rounded-xl border border-white/40 bg-white/15 hover:bg-white/25 text-white transition-all duration-200 backdrop-blur-sm">
-                            <svg class="w-[17px] h-[17px] mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.7">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                            </svg>
-                            <span class="absolute top-[8px] right-[8px] w-2 h-2 rounded-full bg-[#10b981] ring-2 ring-white"></span>
-                        </button>
+                        <!-- Cloche notifications -->
+                        <div class="relative">
+                            <button type="button" @click="toggleNotifications"
+                                    aria-label="Notifications"
+                                    class="relative w-10 h-10 rounded-xl border border-white/40 bg-white/15 hover:bg-white/25 text-white transition-all duration-200 backdrop-blur-sm">
+                                <svg class="w-[17px] h-[17px] mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.7">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                </svg>
+                                <span v-if="notificationsCount > 0"
+                                      class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-[#22d3ee]">
+                                    {{ notificationsCount }}
+                                </span>
+                            </button>
+
+                            <!-- Panneau notifications -->
+                            <div v-if="showNotifications"
+                                 class="absolute right-0 mt-3 w-80 bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden z-50">
+                                <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                                    <h3 class="text-[13px] font-bold text-[#1e3a8a]">Notifications</h3>
+                                    <button @click="showNotifications = false" class="text-slate-400 hover:text-slate-600">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <div v-if="notificationsCount === 0" class="px-4 py-8 text-center">
+                                    <p class="text-[12px] text-slate-500">Aucune notification.</p>
+                                </div>
+
+                                <div v-else class="divide-y divide-slate-100 max-h-[400px] overflow-y-auto">
+                                    <Link v-for="(notif, i) in notifications" :key="i"
+                                          :href="notif.href"
+                                          @click="showNotifications = false"
+                                          class="block px-4 py-3 hover:bg-slate-50 transition-colors">
+                                        <div class="flex items-start gap-3">
+                                            <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                                                 :class="notif.type === 'stock' ? 'bg-red-100' : 'bg-amber-100'">
+                                                <svg class="w-4 h-4" :class="notif.type === 'stock' ? 'text-red-600' : 'text-amber-600'"
+                                                     fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                    <path v-if="notif.type === 'stock'" stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                    <path v-else stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <div class="text-[12px] font-semibold text-[#1e3a8a]">{{ notif.title }}</div>
+                                                <div class="text-[11px] text-slate-500 mt-0.5">{{ notif.description }}</div>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
 
                         <Dropdown align="right" width="52">
                             <template #trigger>
@@ -140,7 +194,7 @@ const handleLogout = () => {
             </div>
         </header>
 
-        <main class="max-w-[1500px] mx-auto px-5 lg:px-8 py-7 lg:py-9">
+        <main class="mx-auto max-w-[1600px] px-5 lg:px-8 py-7 lg:py-9">
             <slot />
         </main>
     </div>

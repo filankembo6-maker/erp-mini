@@ -56,35 +56,31 @@ const statusClass = (status) => {
     <WelcomeSplash v-if="showSplash" @finished="onSplashFinished" />
 
     <AuthenticatedLayout>
-        <div class="max-w-[1280px] mx-auto">
+        <div class="w-full">
 
-            <!-- Cartes de synthèse -->
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-6">
+            <!-- Toutes les cartes sur une seule ligne -->
+            <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3 mb-6">
                 <Link v-for="card in cards" :key="card.key" :href="route(card.href)"
                       class="bg-white border border-slate-200 rounded-xl p-4 hover:border-slate-300 hover:shadow-md transition-all group">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="w-9 h-9 rounded-lg flex items-center justify-center shadow-sm" :class="card.color">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm shrink-0" :class="card.color">
                             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
                                 <path stroke-linecap="round" stroke-linejoin="round" :d="card.icon" />
                             </svg>
                         </div>
-                        <svg class="w-3.5 h-3.5 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                        </svg>
+                        <div class="text-[9px] text-slate-500 uppercase tracking-[0.08em] font-semibold leading-tight">
+                            {{ card.label }}
+                        </div>
                     </div>
                     <div class="font-bold text-[#1e3a8a] tabular-nums leading-none tracking-[-0.02em]"
-                         :class="card.money ? 'text-[18px]' : 'text-[26px]'">
+                         :class="card.money ? 'text-[16px]' : 'text-[24px]'">
                         {{ card.money ? formatCFA(stats[card.key] ?? 0) : (stats[card.key] ?? 0) }}
-                    </div>
-                    <div class="text-[10px] text-slate-500 uppercase tracking-[0.1em] font-semibold mt-2">
-                        {{ card.label }}
                     </div>
                 </Link>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
-                <!-- Colonne principale -->
                 <div class="lg:col-span-2 space-y-4">
 
                     <!-- Alertes de stock -->
@@ -205,7 +201,6 @@ const statusClass = (status) => {
 
                 </div>
 
-                <!-- Colonne latérale -->
                 <div class="space-y-4">
 
                     <div v-if="can(['commercial'])" class="rounded-xl p-5 text-white shadow-md bg-[#1e3a8a]">
@@ -233,7 +228,7 @@ const statusClass = (status) => {
                         </div>
                     </div>
 
-                    <!-- Activité récente (admin uniquement) -->
+                    <!-- Activité récente -->
                     <div v-if="can([])" class="bg-white border border-slate-200 rounded-xl overflow-hidden">
                         <div class="px-5 py-4 border-b border-slate-100">
                             <h2 class="text-[13px] font-bold text-[#1e3a8a]">Activité récente</h2>
