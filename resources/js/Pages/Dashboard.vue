@@ -43,29 +43,7 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
     <AuthenticatedLayout>
         <div class="max-w-[1400px] mx-auto">
 
-            <!-- En-tête -->
-            <div class="mb-8 pb-6 border-b border-slate-300">
-                <div class="flex flex-wrap items-end justify-between gap-4">
-                    <div>
-                        <div class="text-[10px] font-semibold tracking-[0.2em] uppercase text-[#0891b2]">
-                            Cockpit
-                        </div>
-                        <h1 class="text-[28px] font-bold text-[#1e3a8a] tracking-[-0.01em] mt-2">
-                            Tableau de bord
-                        </h1>
-                        <p class="text-[13px] text-slate-600 mt-1">
-                            Synthèse de l'activité commerciale
-                        </p>
-                    </div>
-                    <div class="flex items-center gap-2 text-[11px] text-slate-600">
-                        <span class="w-1.5 h-1.5 bg-[#10b981] rounded-full"></span>
-                        <span>Données actualisées à l'instant</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Cartes statistiques -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <Link v-for="(card, i) in cards" :key="i" :href="route(card.href)"
                       class="bg-white border border-slate-200 rounded-2xl p-6 hover:border-[#22d3ee] hover:shadow-xl hover:shadow-[#22d3ee]/10 transition-all group">
                     <div class="flex items-center justify-between mb-6">
@@ -87,12 +65,10 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                 </Link>
             </div>
 
-            <!-- Grille principale -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
                 <div class="lg:col-span-2 space-y-5">
 
-                    <!-- Alertes de stock -->
                     <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
                         <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-[#22d3ee]/10 to-transparent">
                             <div>
@@ -126,7 +102,6 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                         </div>
                     </div>
 
-                    <!-- Devis récents -->
                     <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
                         <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-[#10b981]/10 to-transparent">
                             <div>
@@ -158,7 +133,6 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
 
                 <div class="space-y-5">
 
-                    <!-- Bloc "En attente" -->
                     <div class="rounded-2xl p-6 text-white shadow-lg" style="background: linear-gradient(135deg, #1e3a8a 0%, #22d3ee 50%, #10b981 100%);">
                         <div class="text-[10px] uppercase tracking-[0.2em] text-white/85 font-semibold">En attente</div>
                         <div class="text-[11px] text-white/75 mt-1">Devis non convertis</div>
@@ -170,7 +144,6 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                         </div>
                     </div>
 
-                    <!-- Bloc "À encaisser" -->
                     <div class="bg-white border border-slate-200 rounded-2xl p-6">
                         <div class="text-[10px] uppercase tracking-[0.2em] text-[#f59e0b] font-semibold">À encaisser</div>
                         <div class="text-[11px] text-slate-500 mt-1">Factures impayées</div>
@@ -182,7 +155,6 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                         </div>
                     </div>
 
-                    <!-- Activité -->
                     <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
                         <div class="px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-[#1e3a8a]/5 to-transparent">
                             <h2 class="text-[14px] font-bold text-[#1e3a8a]">Activité récente</h2>
