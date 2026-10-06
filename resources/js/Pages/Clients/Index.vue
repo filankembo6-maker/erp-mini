@@ -35,10 +35,7 @@ const deleteClient = (id, name) => {
         <div class="w-full space-y-4">
 
             <div class="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                    <h1 class="text-[22px] font-bold text-[#1e3a8a]">Clients</h1>
-                    <p class="text-[12px] text-slate-500 mt-0.5">Répertoire commercial</p>
-                </div>
+                <h1 class="text-[22px] font-bold text-[#1e3a8a]">Clients</h1>
                 <Link :href="route('clients.create')"
                       class="inline-flex items-center gap-2 h-9 px-4 rounded-lg text-[12px] font-semibold bg-[#1e3a8a] hover:bg-[#152e6b] text-white transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">

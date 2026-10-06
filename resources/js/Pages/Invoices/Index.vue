@@ -24,10 +24,7 @@ const deleteInvoice = (id) => {
         <div class="w-full space-y-4">
 
             <div class="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                    <h1 class="text-[22px] font-bold text-[#1e3a8a]">Factures</h1>
-                    <p class="text-[12px] text-slate-500 mt-0.5">Suivi des encaissements</p>
-                </div>
+                <h1 class="text-[22px] font-bold text-[#1e3a8a]">Factures</h1>
             </div>
 
             <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
@@ -44,7 +41,7 @@ const deleteInvoice = (id) => {
                             <th class="px-5 py-3 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-[0.1em]">Date</th>
                             <th class="px-5 py-3 text-center text-[10px] font-semibold text-slate-500 uppercase tracking-[0.1em]">Statut</th>
                             <th class="px-5 py-3 text-right text-[10px] font-semibold text-slate-500 uppercase tracking-[0.1em]">Total</th>
-                            <th class="px-5 py-3 w-24"></th>
+                            <th class="px-5 py-3 w-32"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -60,6 +57,9 @@ const deleteInvoice = (id) => {
                             <td class="px-5 py-3 text-[13px] font-bold text-[#1e3a8a] text-right tabular-nums">{{ invoice.total_amount }} €</td>
                             <td class="px-5 py-3">
                                 <div class="flex items-center justify-end gap-1">
+                                    <a :href="route('invoices.pdf', invoice.id)" target="_blank" class="w-7 h-7 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors" title="Télécharger PDF">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 11v6m0 0l-2-2m2 2l2-2" /></svg>
+                                    </a>
                                     <Link :href="route('invoices.show', invoice.id)" class="w-7 h-7 rounded-md text-slate-400 hover:text-[#0891b2] hover:bg-cyan-50 flex items-center justify-center transition-colors" title="Voir">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                     </Link>
