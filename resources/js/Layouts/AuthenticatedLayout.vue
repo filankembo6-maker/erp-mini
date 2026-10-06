@@ -42,12 +42,7 @@ const userName = computed(() => {
 });
 
 const initials = computed(() => {
-    return userName.value
-        .split(' ')
-        .filter(Boolean)
-        .slice(0, 2)
-        .map(p => p[0].toUpperCase())
-        .join('');
+    return userName.value.split(' ').filter(Boolean).slice(0, 2).map(p => p[0].toUpperCase()).join('');
 });
 
 const handleLogout = () => {
@@ -56,9 +51,8 @@ const handleLogout = () => {
 </script>
 
 <template>
-    <div class="min-h-screen bg-[#f0fdfa] text-[#0f172a]">
+    <div class="min-h-screen bg-[#ecfeff] text-[#0f172a]">
 
-        <!-- HEADER avec le dégradé de la carte de connexion -->
         <header class="sticky top-0 z-50 shadow-md"
                 style="background: linear-gradient(135deg, #1e3a8a 0%, #22d3ee 50%, #10b981 100%);">
 
@@ -83,17 +77,9 @@ const handleLogout = () => {
                     <div class="hidden lg:block w-px h-8 bg-white/30 mx-1"></div>
 
                     <nav class="hidden md:flex items-center gap-1 flex-1 min-w-0">
-                        <Link
-                            v-for="item in menuItems"
-                            :key="item.route"
-                            :href="route(item.route)"
+                        <Link v-for="item in menuItems" :key="item.route" :href="route(item.route)"
                             class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-[13px] whitespace-nowrap transition-all duration-200"
-                            :class="
-                                isActive(item.route)
-                                    ? 'bg-white text-[#0f172a] font-semibold shadow-md'
-                                    : 'text-white/90 hover:bg-white/15 hover:text-white'
-                            "
-                        >
+                            :class="isActive(item.route) ? 'bg-white text-[#0f172a] font-semibold shadow-md' : 'text-white/90 hover:bg-white/15 hover:text-white'">
                             <svg class="w-[16px] h-[16px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.7">
                                 <path stroke-linecap="round" stroke-linejoin="round" :d="item.icon" />
                             </svg>
@@ -102,7 +88,6 @@ const handleLogout = () => {
                     </nav>
 
                     <div class="ml-auto flex items-center gap-2 sm:gap-3 shrink-0">
-
                         <div class="hidden xl:block text-right mr-1">
                             <div class="text-[11px] text-white/80">{{ dateStr }}</div>
                             <div class="text-[13px] font-bold text-white mt-0.5">{{ timeStr }}</div>
@@ -141,17 +126,9 @@ const handleLogout = () => {
 
                 <div class="md:hidden border-t border-white/25 py-2 overflow-x-auto scrollbar-none">
                     <nav class="flex items-center gap-1 min-w-max">
-                        <Link
-                            v-for="item in menuItems"
-                            :key="`mobile-${item.route}`"
-                            :href="route(item.route)"
+                        <Link v-for="item in menuItems" :key="`mobile-${item.route}`" :href="route(item.route)"
                             class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] transition-colors"
-                            :class="
-                                isActive(item.route)
-                                    ? 'bg-white text-[#0f172a] font-semibold'
-                                    : 'text-white/90 hover:bg-white/15'
-                            "
-                        >
+                            :class="isActive(item.route) ? 'bg-white text-[#0f172a] font-semibold' : 'text-white/90 hover:bg-white/15'">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.7">
                                 <path stroke-linecap="round" stroke-linejoin="round" :d="item.icon" />
                             </svg>
