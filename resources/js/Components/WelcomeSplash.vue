@@ -4,12 +4,15 @@ import { onMounted, ref } from 'vue';
 const emit = defineEmits(['finished']);
 
 const visible = ref(true);
+const showLogo = ref(false);
 
 onMounted(() => {
+    setTimeout(() => { showLogo.value = true; }, 400);
+
     setTimeout(() => {
         visible.value = false;
-        setTimeout(() => emit('finished'), 600);
-    }, 2200);
+        emit('finished');
+    }, 3200);
 });
 </script>
 
@@ -17,79 +20,98 @@ onMounted(() => {
     <transition name="splash">
         <div
             v-if="visible"
-            class="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden bg-[#0a0a0a]"
+            class="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden"
+            style="background: radial-gradient(circle at center, #ffffff 0%, #f0fdfa 25%, #22d3ee 60%, #1e40af 100%);"
         >
-            <!-- Halo vert discret -->
-            <div class="absolute inset-0 opacity-30"
-                 style="background: radial-gradient(circle at 50% 50%, rgba(22,101,52,0.4) 0%, transparent 55%);">
-            </div>
+            <!-- Halo blanc central -->
+            <div
+                class="absolute w-[900px] h-[900px] rounded-full blur-3xl opacity-90 animate-pulse-slow"
+                style="background: radial-gradient(circle, #ffffff 0%, rgba(255,255,255,0.7) 40%, transparent 75%);"
+            ></div>
 
-            <!-- Grain fin -->
-            <div class="absolute inset-0 opacity-[0.015]"
-                 style="background-image: radial-gradient(circle, #ffffff 1px, transparent 1px); background-size: 4px 4px;">
-            </div>
+            <!-- Halos décoratifs -->
+            <div
+                class="absolute w-[900px] h-[900px] rounded-full blur-[120px] opacity-40 animate-pulse-slow"
+                style="background: radial-gradient(circle, #22d3ee 0%, transparent 70%);"
+            ></div>
+            <div
+                class="absolute w-[800px] h-[800px] rounded-full blur-[100px] opacity-30 animate-pulse-slow"
+                style="background: radial-gradient(circle, #10b981 0%, transparent 70%); animation-delay: 1.5s;"
+            ></div>
 
             <!-- Logo central -->
             <div class="relative z-10">
-                <div class="splash-logo">
+                <div v-if="showLogo" class="relative">
+                    <div
+                        class="absolute inset-0 rounded-full blur-2xl opacity-60"
+                        style="background: radial-gradient(circle, #ffffff 0%, transparent 70%); transform: scale(1.4);"
+                    ></div>
                     <img
                         src="/images/logo-splash.png"
                         alt="BISALELI TECH"
-                        class="h-20 w-auto brightness-0 invert"
+                        class="relative h-[500px] w-auto splash-logo-zoom"
                     />
                 </div>
+            </div>
 
-                <!-- Ligne sous le logo -->
-                <div class="splash-line mx-auto mt-8 h-px w-16 bg-[#166534]"></div>
-
-                <!-- Nom -->
-                <div class="text-center mt-6 splash-sub">
-                    <p class="text-[11px] text-[#525252] tracking-[0.4em] uppercase font-medium">
-                        BISALELI TECH
-                    </p>
+            <!-- Barre de chargement -->
+            <div
+                v-if="showLogo"
+                class="absolute bottom-20 flex flex-col items-center gap-3 splash-text-appear"
+            >
+                <div class="w-64 h-1 bg-white/30 rounded-full overflow-hidden backdrop-blur">
+                    <div class="splash-load-bar h-full rounded-full"></div>
                 </div>
+                <p class="text-xs text-white/80 tracking-[0.3em] uppercase font-medium">
+                    Chargement
+                </p>
             </div>
         </div>
     </transition>
 </template>
 
 <style scoped>
-.splash-leave-active {
-    transition: opacity 0.6s ease;
-}
-.splash-leave-to {
+.splash-leave-active { transition: opacity 0.8s ease; }
+.splash-leave-to { opacity: 0; }
+
+.splash-logo-zoom {
+    animation: logoZoom 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     opacity: 0;
+    transform: scale(0.4);
 }
 
-.splash-logo {
-    animation: logoSettle 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    opacity: 0;
-    transform: translateY(8px);
+@keyframes logoZoom {
+    0% { opacity: 0; transform: scale(0.4); filter: blur(12px); }
+    50% { opacity: 1; transform: scale(1.08); filter: blur(0); }
+    100% { opacity: 1; transform: scale(1); filter: blur(0); }
 }
 
-@keyframes logoSettle {
-    0% { opacity: 0; transform: translateY(8px); }
+.splash-text-appear {
+    animation: textAppear 1s ease-out 0.8s forwards;
+    opacity: 0;
+    transform: translateY(15px);
+}
+
+@keyframes textAppear {
+    0% { opacity: 0; transform: translateY(15px); }
     100% { opacity: 1; transform: translateY(0); }
 }
 
-.splash-line {
-    animation: lineGrow 0.9s ease-out 0.6s forwards;
-    transform-origin: center;
-    transform: scaleX(0);
+.splash-load-bar {
+    background: linear-gradient(90deg, #1e40af, #22d3ee, #10b981);
+    animation: loadBar 2.2s ease-in-out 0.6s forwards;
+    width: 0%;
 }
 
-@keyframes lineGrow {
-    0% { transform: scaleX(0); opacity: 0; }
-    100% { transform: scaleX(1); opacity: 1; }
+@keyframes loadBar {
+    0% { width: 0%; }
+    100% { width: 100%; }
 }
 
-.splash-sub {
-    animation: textFadeIn 0.8s ease-out 1.1s forwards;
-    opacity: 0;
-}
+.animate-pulse-slow { animation: pulseSlow 4s ease-in-out infinite; }
 
-@keyframes textFadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
+@keyframes pulseSlow {
+    0%, 100% { opacity: 0.25; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.15); }
 }
 </style>
