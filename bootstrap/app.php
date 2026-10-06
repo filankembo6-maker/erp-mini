@@ -17,22 +17,20 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);
 
-        if (app()->environment('local')) {
-            $middleware->validateCsrfTokens(except: [
-                'login',
-                'logout',
-                'products',
-                'products/*',
-                'clients',
-                'clients/*',
-                'stock-movements',
-                'stock-movements/*',
-                'quotes',
-                'quotes/*',
-                'invoices',
-                'invoices/*',
-            ]);
-        }
+        $middleware->validateCsrfTokens(except: [
+            'login',
+            'logout',
+            'products',
+            'products/*',
+            'clients',
+            'clients/*',
+            'stock-movements',
+            'stock-movements/*',
+            'quotes',
+            'quotes/*',
+            'invoices',
+            'invoices/*',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
