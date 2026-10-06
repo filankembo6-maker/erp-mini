@@ -13,7 +13,6 @@ defineProps({
     activity: { type: Array, default: () => [] },
 });
 
-/* ---------- Splash (une fois par session) ---------- */
 const showSplash = ref(false);
 onMounted(() => {
     if (!sessionStorage.getItem('splash_seen')) {
@@ -23,30 +22,25 @@ onMounted(() => {
 });
 const onSplashFinished = () => { showSplash.value = false; };
 
-/* ---------- Accès par rôle ----------
-   Si les rôles ne sont pas partagés par Inertia (roles absent),
-   on affiche tout plutôt que de masquer le dashboard. */
 const roles = computed(() => usePage().props.auth?.user?.roles);
 const can = (allowed) =>
     !roles.value || roles.value.includes('admin') || allowed.some((r) => roles.value.includes(r));
 
-/* ---------- Cartes de synthèse ---------- */
 const allCards = [
-    { label: 'Chiffre d\'affaires du mois', key: 'revenue_month', money: true, href: 'invoices.index', roles: ['commercial'], color: 'from-[#1e3a8a] to-[#3b82f6]', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
-    { label: 'Devis en attente', key: 'quotes_pending', href: 'quotes.index', roles: ['commercial'], color: 'from-[#10b981] to-[#34d399]', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
-    { label: 'Factures impayées', key: 'invoices_unpaid', href: 'invoices.index', roles: ['commercial'], color: 'from-[#f59e0b] to-[#d97706]', icon: 'M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z' },
-    { label: 'Factures en retard (+30 j)', key: 'invoices_late', href: 'invoices.index', roles: ['commercial'], color: 'from-[#dc2626] to-[#f87171]', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
-    { label: 'Produits au catalogue', key: 'products', href: 'products.index', roles: ['magasinier'], color: 'from-[#1e3a8a] to-[#3b82f6]', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' },
-    { label: 'Produits en alerte de stock', key: 'low_stock_count', href: 'products.index', roles: ['magasinier'], color: 'from-[#dc2626] to-[#f87171]', icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z' },
-    { label: 'Clients actifs', key: 'clients', href: 'clients.index', roles: ['commercial'], color: 'from-[#0891b2] to-[#22d3ee]', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z' },
+    { label: 'Chiffre d\'affaires du mois', key: 'revenue_month', money: true, href: 'invoices.index', roles: ['commercial'], color: 'bg-[#1e3a8a]', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
+    { label: 'Devis en attente', key: 'quotes_pending', href: 'quotes.index', roles: ['commercial'], color: 'bg-[#10b981]', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
+    { label: 'Factures impayées', key: 'invoices_unpaid', href: 'invoices.index', roles: ['commercial'], color: 'bg-[#f59e0b]', icon: 'M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z' },
+    { label: 'Factures en retard (+30 j)', key: 'invoices_late', href: 'invoices.index', roles: ['commercial'], color: 'bg-[#dc2626]', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
+    { label: 'Produits au catalogue', key: 'products', href: 'products.index', roles: ['magasinier'], color: 'bg-[#1e3a8a]', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' },
+    { label: 'Produits en alerte de stock', key: 'low_stock_count', href: 'products.index', roles: ['magasinier'], color: 'bg-[#dc2626]', icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z' },
+    { label: 'Clients actifs', key: 'clients', href: 'clients.index', roles: ['commercial'], color: 'bg-[#0891b2]', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z' },
 ];
+
 const cards = computed(() => allCards.filter((c) => can(c.roles)));
 
-/* ---------- Formats ---------- */
 const formatDate = (date) => new Date(date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
 const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 
-/* Adapter les libellés ci-dessous aux statuts exacts de ta base si besoin */
 const statusClass = (status) => {
     const s = (status || '').toLowerCase();
     if (s === 'payée' || s === 'payee' || s === 'paid') return 'bg-emerald-100 text-emerald-700';
@@ -64,17 +58,17 @@ const statusClass = (status) => {
     <AuthenticatedLayout>
         <div class="max-w-[1400px] mx-auto">
 
-            <!-- Cartes de synthèse (filtrées par rôle) -->
+            <!-- Cartes de synthèse -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <Link v-for="card in cards" :key="card.key" :href="route(card.href)"
-                      class="bg-white border border-slate-200 rounded-2xl p-6 hover:border-[#22d3ee] hover:shadow-xl hover:shadow-[#22d3ee]/10 transition-all group">
+                      class="bg-white border border-slate-200 rounded-2xl p-6 hover:border-slate-300 hover:shadow-lg transition-all group">
                     <div class="flex items-center justify-between mb-6">
-                        <div class="w-11 h-11 rounded-xl flex items-center justify-center shadow-md" :class="`bg-gradient-to-br ${card.color}`">
+                        <div class="w-11 h-11 rounded-xl flex items-center justify-center shadow-sm" :class="card.color">
                             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
                                 <path stroke-linecap="round" stroke-linejoin="round" :d="card.icon" />
                             </svg>
                         </div>
-                        <svg class="w-4 h-4 text-[#22d3ee] opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <svg class="w-4 h-4 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
                     </div>
@@ -93,12 +87,19 @@ const statusClass = (status) => {
                 <!-- Colonne principale -->
                 <div class="lg:col-span-2 space-y-5">
 
-                    <!-- Alertes de stock (magasinier / admin) -->
+                    <!-- Alertes de stock -->
                     <div v-if="can(['magasinier'])" class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-                        <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-red-100/60 to-transparent">
-                            <div>
-                                <h2 class="text-[14px] font-bold text-[#1e3a8a]">Alertes de stock</h2>
-                                <p class="text-[11px] text-slate-500 mt-0.5">Produits sous le seuil de réapprovisionnement</p>
+                        <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-lg bg-red-500 flex items-center justify-center shadow-sm">
+                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h2 class="text-[14px] font-bold text-[#1e3a8a]">Alertes de stock</h2>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">Produits sous le seuil de réapprovisionnement</p>
+                                </div>
                             </div>
                             <Link :href="route('products.index')" class="text-[10px] uppercase tracking-[0.16em] font-semibold text-[#0891b2] hover:text-[#1e3a8a] transition-colors">
                                 Consulter
@@ -129,12 +130,19 @@ const statusClass = (status) => {
                         </div>
                     </div>
 
-                    <!-- Devis récents (commercial / admin) -->
+                    <!-- Devis récents -->
                     <div v-if="can(['commercial'])" class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-                        <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-[#10b981]/10 to-transparent">
-                            <div>
-                                <h2 class="text-[14px] font-bold text-[#1e3a8a]">Devis récents</h2>
-                                <p class="text-[11px] text-slate-500 mt-0.5">Dernières propositions commerciales</p>
+                        <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-lg bg-emerald-500 flex items-center justify-center shadow-sm">
+                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h2 class="text-[14px] font-bold text-[#1e3a8a]">Devis récents</h2>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">Dernières propositions commerciales</p>
+                                </div>
                             </div>
                             <Link :href="route('quotes.index')" class="text-[10px] uppercase tracking-[0.16em] font-semibold text-[#10b981] hover:text-[#1e3a8a] transition-colors">
                                 Consulter
@@ -157,12 +165,19 @@ const statusClass = (status) => {
                         </div>
                     </div>
 
-                    <!-- Factures récentes (commercial / admin) -->
+                    <!-- Factures récentes -->
                     <div v-if="can(['commercial'])" class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-                        <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-[#f59e0b]/10 to-transparent">
-                            <div>
-                                <h2 class="text-[14px] font-bold text-[#1e3a8a]">Factures récentes</h2>
-                                <p class="text-[11px] text-slate-500 mt-0.5">Dernières factures émises et leur statut</p>
+                        <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-lg bg-amber-500 flex items-center justify-center shadow-sm">
+                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h2 class="text-[14px] font-bold text-[#1e3a8a]">Factures récentes</h2>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">Dernières factures émises et leur statut</p>
+                                </div>
                             </div>
                             <Link :href="route('invoices.index')" class="text-[10px] uppercase tracking-[0.16em] font-semibold text-[#d97706] hover:text-[#1e3a8a] transition-colors">
                                 Consulter
@@ -193,7 +208,7 @@ const statusClass = (status) => {
                 <!-- Colonne latérale -->
                 <div class="space-y-5">
 
-                    <div v-if="can(['commercial'])" class="rounded-2xl p-6 text-white shadow-lg" style="background: linear-gradient(135deg, #1e3a8a 0%, #22d3ee 50%, #10b981 100%);">
+                    <div v-if="can(['commercial'])" class="rounded-2xl p-6 text-white shadow-lg bg-[#1e3a8a]">
                         <div class="text-[10px] uppercase tracking-[0.2em] text-white/85 font-semibold">En attente</div>
                         <div class="text-[11px] text-white/75 mt-1">Devis non convertis</div>
                         <div class="text-[28px] font-bold tabular-nums mt-4 tracking-[-0.01em] drop-shadow-sm">
@@ -220,7 +235,7 @@ const statusClass = (status) => {
 
                     <!-- Activité récente (admin uniquement) -->
                     <div v-if="can([])" class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-                        <div class="px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-[#1e3a8a]/5 to-transparent">
+                        <div class="px-6 py-5 border-b border-slate-100">
                             <h2 class="text-[14px] font-bold text-[#1e3a8a]">Activité récente</h2>
                         </div>
 
