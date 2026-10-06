@@ -11,24 +11,28 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->trustProxies(at: '*');
+
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);
 
-        $middleware->validateCsrfTokens(except: [
-            'login',
-            'logout',
-            'products',
-            'products/*',
-            'clients',
-            'clients/*',
-            'stock-movements',
-            'stock-movements/*',
-            'quotes',
-            'quotes/*',
-            'invoices',
-            'invoices/*',
-        ]);
+        if (app()->environment('local')) {
+            $middleware->validateCsrfTokens(except: [
+                'login',
+                'logout',
+                'products',
+                'products/*',
+                'clients',
+                'clients/*',
+                'stock-movements',
+                'stock-movements/*',
+                'quotes',
+                'quotes/*',
+                'invoices',
+                'invoices/*',
+            ]);
+        }
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
