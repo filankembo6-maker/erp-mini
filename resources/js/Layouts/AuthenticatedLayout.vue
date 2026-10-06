@@ -25,6 +25,10 @@ const isActive = (itemRoute) => {
     const base = '/' + itemRoute.split('.')[0];
     return current === base || current.startsWith(base + '/');
 };
+
+const handleLogout = () => {
+    sessionStorage.removeItem('splash_seen');
+};
 </script>
 
 <template>
@@ -65,6 +69,7 @@ const isActive = (itemRoute) => {
                 :href="route('logout')"
                 method="post"
                 as="button"
+                @click="handleLogout"
                 class="w-12 h-12 rounded-full bg-white/15 hover:bg-red-600 flex items-center justify-center transition-colors duration-150 group relative"
             >
                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -79,7 +84,6 @@ const isActive = (itemRoute) => {
         <!-- Contenu -->
         <div class="ml-28 mr-4 py-4 min-h-screen flex flex-col gap-4">
 
-            <!-- Topbar -->
             <header class="h-16 rounded-2xl flex items-center justify-between px-6 bg-sky-200 shadow-sm border border-sky-300/60">
 
                 <div class="flex items-center gap-3">
@@ -116,7 +120,7 @@ const isActive = (itemRoute) => {
                         </template>
                         <template #content>
                             <DropdownLink :href="route('profile.edit')">Mon profil</DropdownLink>
-                            <DropdownLink :href="route('logout')" method="post" as="button">Déconnexion</DropdownLink>
+                            <DropdownLink :href="route('logout')" method="post" as="button" @click="handleLogout">Déconnexion</DropdownLink>
                         </template>
                     </Dropdown>
                 </div>

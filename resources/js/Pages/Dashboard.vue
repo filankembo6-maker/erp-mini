@@ -45,7 +45,6 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
     <AuthenticatedLayout>
         <div class="max-w-[1400px] mx-auto space-y-6">
 
-            <!-- En-tête -->
             <div class="flex flex-wrap items-end justify-between gap-4">
                 <div>
                     <h1 class="text-[26px] font-semibold text-[#0a0a0a] tracking-[-0.02em]">Tableau de bord</h1>
@@ -57,7 +56,6 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                 </div>
             </div>
 
-            <!-- Cartes stats -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Link v-for="(card, i) in cards" :key="i"
                       :href="route(card.href)"
@@ -73,13 +71,10 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                 </Link>
             </div>
 
-            <!-- Grille principale -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
-                <!-- Colonne gauche -->
                 <div class="lg:col-span-2 space-y-4">
 
-                    <!-- Produits en alerte -->
                     <div class="bg-white rounded-2xl border border-[#e7e5e4]">
                         <div class="flex items-center justify-between px-6 py-4 border-b border-[#f5f5f4]">
                             <h2 class="text-[14px] font-semibold text-[#0a0a0a]">Produits en alerte de stock</h2>
@@ -109,7 +104,6 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                         </div>
                     </div>
 
-                    <!-- Devis récents -->
                     <div class="bg-white rounded-2xl border border-[#e7e5e4]">
                         <div class="flex items-center justify-between px-6 py-4 border-b border-[#f5f5f4]">
                             <h2 class="text-[14px] font-semibold text-[#0a0a0a]">Devis récents</h2>
@@ -135,10 +129,8 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
 
                 </div>
 
-                <!-- Colonne droite -->
                 <div class="space-y-4">
 
-                    <!-- Montants clés -->
                     <div class="bg-white rounded-2xl border border-[#e7e5e4] p-6">
                         <div class="text-[11px] text-[#a3a3a3] uppercase tracking-wider font-semibold">Devis en attente</div>
                         <div class="text-[24px] font-semibold text-[#0a0a0a] tabular-nums mt-2">{{ formatCFA(stats.quotes_pending_amount) }}</div>
@@ -151,7 +143,6 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                         <div class="text-[12px] text-[#737373] mt-1">{{ stats.invoices_unpaid }} facture<span v-if="stats.invoices_unpaid > 1">s</span></div>
                     </div>
 
-                    <!-- Activité récente -->
                     <div class="bg-white rounded-2xl border border-[#e7e5e4]">
                         <div class="px-6 py-4 border-b border-[#f5f5f4]">
                             <h2 class="text-[14px] font-semibold text-[#0a0a0a]">Activité récente</h2>
