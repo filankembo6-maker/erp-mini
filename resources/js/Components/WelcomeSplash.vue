@@ -21,15 +21,15 @@ onMounted(() => {
         <div
             v-if="visible"
             class="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden"
-            style="background: radial-gradient(circle at center, #ffffff 0%, #f0fdfa 25%, #22d3ee 60%, #1e40af 100%);"
+            style="background: linear-gradient(135deg, #1e40af 0%, #22d3ee 50%, #10b981 100%);"
         >
-            <!-- Halo blanc central -->
+            <!-- Halo blanc central lumineux -->
             <div
-                class="absolute w-[900px] h-[900px] rounded-full blur-3xl opacity-90 animate-pulse-slow"
-                style="background: radial-gradient(circle, #ffffff 0%, rgba(255,255,255,0.7) 40%, transparent 75%);"
+                class="absolute w-[900px] h-[900px] rounded-full blur-3xl opacity-60 animate-pulse-slow"
+                style="background: radial-gradient(circle, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.3) 40%, transparent 75%);"
             ></div>
 
-            <!-- Halos décoratifs -->
+            <!-- Halos décoratifs colorés -->
             <div
                 class="absolute w-[900px] h-[900px] rounded-full blur-[120px] opacity-40 animate-pulse-slow"
                 style="background: radial-gradient(circle, #22d3ee 0%, transparent 70%);"
@@ -43,7 +43,7 @@ onMounted(() => {
             <div class="relative z-10">
                 <div v-if="showLogo" class="relative">
                     <div
-                        class="absolute inset-0 rounded-full blur-2xl opacity-60"
+                        class="absolute inset-0 rounded-full blur-2xl opacity-50"
                         style="background: radial-gradient(circle, #ffffff 0%, transparent 70%); transform: scale(1.4);"
                     ></div>
                     <img
@@ -98,7 +98,7 @@ onMounted(() => {
 }
 
 .splash-load-bar {
-    background: linear-gradient(90deg, #1e40af, #22d3ee, #10b981);
+    background: linear-gradient(90deg, #ffffff, #f0fdfa, #ffffff);
     animation: loadBar 2.2s ease-in-out 0.6s forwards;
     width: 0%;
 }
@@ -111,7 +111,7 @@ onMounted(() => {
 .animate-pulse-slow { animation: pulseSlow 4s ease-in-out infinite; }
 
 @keyframes pulseSlow {
-    0%, 100% { opacity: 0.25; transform: scale(1); }
+    0%, 100% { opacity: 0.3; transform: scale(1); }
     50% { opacity: 0.5; transform: scale(1.15); }
 }
 </style>
