@@ -1,3 +1,16 @@
+# =====================================================
+# Étape 1 : compilation du frontend (Vue + Vite)
+# =====================================================
+FROM node:20-alpine AS assets
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# =====================================================
+# Étape 2 : image PHP avec Nginx
+# =====================================================
 FROM php:8.3-fpm
 
 RUN apt-get update && apt-get install -y \
@@ -31,6 +44,9 @@ WORKDIR /var/www/html
 
 COPY . .
 
+# Copier les assets compilés depuis l'étape Node
+COPY --from=assets /app/public/build /var/www/html/public/build
+
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 COPY docker/nginx/default.conf /etc/nginx/sites-available/default
@@ -42,7 +58,7 @@ RUN mkdir -p /var/www/html/storage/framework/{sessions,views,cache} \
     && chown -R www-data:www-data /var/www/html/bootstrap/cache
 
 RUN printf '#!/bin/sh\n\
-php artisan migrate --force --seed\n\
+php artisan migrate --force\n\
 php artisan config:cache\n\
 php artisan route:cache\n\
 php artisan view:cache\n\
