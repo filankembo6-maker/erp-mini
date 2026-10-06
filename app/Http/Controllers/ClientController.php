@@ -8,12 +8,40 @@ use Inertia\Inertia;
 
 class ClientController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $clients = Client::orderBy('created_at', 'desc')->get();
+        $query = Client::query();
+
+        // Recherche par nom, email ou téléphone
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        // Tri
+        $sort = $request->input('sort', 'created_at');
+        $direction = $request->input('direction', 'desc');
+
+        $allowedSorts = ['name', 'email', 'city', 'created_at'];
+        if (in_array($sort, $allowedSorts)) {
+            $query->orderBy($sort, $direction === 'asc' ? 'asc' : 'desc');
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $clients = $query->get();
 
         return Inertia::render('Clients/Index', [
             'clients' => $clients,
+            'filters' => [
+                'search' => $request->input('search', ''),
+                'sort' => $sort,
+                'direction' => $direction,
+            ],
         ]);
     }
 

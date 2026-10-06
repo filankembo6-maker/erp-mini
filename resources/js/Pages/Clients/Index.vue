@@ -1,21 +1,46 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
+import { ref, watch } from 'vue';
 
-const props = defineProps({ clients: Array });
-const page = usePage();
-const search = ref('');
-
-const filtered = computed(() => {
-    if (!search.value) return props.clients;
-    const q = search.value.toLowerCase();
-    return props.clients.filter(c =>
-        c.name.toLowerCase().includes(q) ||
-        c.email.toLowerCase().includes(q) ||
-        (c.phone && c.phone.includes(q))
-    );
+const props = defineProps({
+    clients: Array,
+    filters: Object,
 });
+
+const page = usePage();
+const search = ref(props.filters?.search ?? '');
+const sort = ref(props.filters?.sort ?? 'created_at');
+const direction = ref(props.filters?.direction ?? 'desc');
+
+let searchTimeout = null;
+
+const applyFilters = () => {
+    router.get(route('clients.index'), {
+        search: search.value,
+        sort: sort.value,
+        direction: direction.value,
+    }, {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+    });
+};
+
+watch(search, () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => applyFilters(), 300);
+});
+
+const sortBy = (column) => {
+    if (sort.value === column) {
+        direction.value = direction.value === 'asc' ? 'desc' : 'asc';
+    } else {
+        sort.value = column;
+        direction.value = 'asc';
+    }
+    applyFilters();
+};
 
 const deleteClient = (id, name) => {
     if (confirm(`Supprimer "${name}" ?`)) {
@@ -69,14 +94,35 @@ const deleteClient = (id, name) => {
                 <table v-else class="w-full">
                     <thead>
                         <tr class="border-b border-[#f5f5f4]">
-                            <th class="px-6 py-3 text-left text-[10px] font-semibold text-[#a3a3a3] uppercase tracking-wider">Client</th>
-                            <th class="px-6 py-3 text-left text-[10px] font-semibold text-[#a3a3a3] uppercase tracking-wider">Contact</th>
-                            <th class="px-6 py-3 text-left text-[10px] font-semibold text-[#a3a3a3] uppercase tracking-wider">Ville</th>
+                            <th @click="sortBy('name')" class="px-6 py-3 text-left text-[10px] font-semibold text-[#a3a3a3] uppercase tracking-wider cursor-pointer hover:text-[#0a0a0a] select-none">
+                                <span class="inline-flex items-center gap-1">
+                                    Client
+                                    <svg v-if="sort === 'name'" class="w-3 h-3" :class="direction === 'asc' ? '' : 'rotate-180'" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 6l6 6H4z" />
+                                    </svg>
+                                </span>
+                            </th>
+                            <th @click="sortBy('email')" class="px-6 py-3 text-left text-[10px] font-semibold text-[#a3a3a3] uppercase tracking-wider cursor-pointer hover:text-[#0a0a0a] select-none">
+                                <span class="inline-flex items-center gap-1">
+                                    Contact
+                                    <svg v-if="sort === 'email'" class="w-3 h-3" :class="direction === 'asc' ? '' : 'rotate-180'" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 6l6 6H4z" />
+                                    </svg>
+                                </span>
+                            </th>
+                            <th @click="sortBy('city')" class="px-6 py-3 text-left text-[10px] font-semibold text-[#a3a3a3] uppercase tracking-wider cursor-pointer hover:text-[#0a0a0a] select-none">
+                                <span class="inline-flex items-center gap-1">
+                                    Ville
+                                    <svg v-if="sort === 'city'" class="w-3 h-3" :class="direction === 'asc' ? '' : 'rotate-180'" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 6l6 6H4z" />
+                                    </svg>
+                                </span>
+                            </th>
                             <th class="px-6 py-3 text-right text-[10px] font-semibold text-[#a3a3a3] uppercase tracking-wider w-32"></th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="client in filtered" :key="client.id" class="border-b border-[#fafaf9] hover:bg-[#fafaf9]">
+                        <tr v-for="client in clients" :key="client.id" class="border-b border-[#fafaf9] hover:bg-[#fafaf9]">
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-9 h-9 rounded-full bg-[#0a0a0a] flex items-center justify-center text-white text-[12px] font-semibold shrink-0">
