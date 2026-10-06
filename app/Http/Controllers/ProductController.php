@@ -8,12 +8,45 @@ use Inertia\Inertia;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::orderBy('created_at', 'desc')->get();
+        $query = Product::query();
+
+        // Recherche par nom ou SKU
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('sku', 'like', "%{$search}%");
+            });
+        }
+
+        // Filtre par statut
+        if ($request->input('filter') === 'alert') {
+            $query->whereColumn('stock_quantity', '<=', 'stock_alert');
+        }
+
+        // Tri
+        $sort = $request->input('sort', 'created_at');
+        $direction = $request->input('direction', 'desc');
+
+        $allowedSorts = ['name', 'price', 'stock_quantity', 'created_at'];
+        if (in_array($sort, $allowedSorts)) {
+            $query->orderBy($sort, $direction === 'asc' ? 'asc' : 'desc');
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $products = $query->get();
 
         return Inertia::render('Products/Index', [
             'products' => $products,
+            'filters' => [
+                'search' => $request->input('search', ''),
+                'filter' => $request->input('filter', 'all'),
+                'sort' => $sort,
+                'direction' => $direction,
+            ],
         ]);
     }
 

@@ -1,13 +1,19 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { formatCFA } from '@/Utils/format';
 
-const props = defineProps({ products: Array });
+const props = defineProps({
+    products: Array,
+    filters: Object,
+});
+
 const page = usePage();
-const search = ref('');
-const filter = ref('all');
+const search = ref(props.filters?.search ?? '');
+const filter = ref(props.filters?.filter ?? 'all');
+const sort = ref(props.filters?.sort ?? 'created_at');
+const direction = ref(props.filters?.direction ?? 'desc');
 
 const stats = computed(() => {
     const total = props.products.length;
@@ -16,15 +22,37 @@ const stats = computed(() => {
     return { total, alerts, value };
 });
 
-const filtered = computed(() => {
-    let list = props.products;
-    if (filter.value === 'alert') list = list.filter(p => p.stock_quantity <= p.stock_alert);
-    if (search.value) {
-        const q = search.value.toLowerCase();
-        list = list.filter(p => p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q));
-    }
-    return list;
+let searchTimeout = null;
+
+const applyFilters = () => {
+    router.get(route('products.index'), {
+        search: search.value,
+        filter: filter.value,
+        sort: sort.value,
+        direction: direction.value,
+    }, {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+    });
+};
+
+watch(search, () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => applyFilters(), 300);
 });
+
+watch(filter, () => applyFilters());
+
+const sortBy = (column) => {
+    if (sort.value === column) {
+        direction.value = direction.value === 'asc' ? 'desc' : 'asc';
+    } else {
+        sort.value = column;
+        direction.value = 'asc';
+    }
+    applyFilters();
+};
 
 const stockStatus = (product) => {
     if (product.stock_quantity === 0) return { label: 'Rupture', color: 'red' };
@@ -103,22 +131,39 @@ const deleteProduct = (id, name) => {
                     <p class="text-[13px] text-[#737373] mt-1.5">Ajoutez votre premier produit pour démarrer.</p>
                 </div>
 
-                <div v-else-if="filtered.length === 0" class="px-6 py-20 text-center">
-                    <p class="text-[13px] text-[#737373]">Aucun résultat</p>
-                </div>
-
                 <table v-else class="w-full">
                     <thead>
                         <tr class="border-b border-[#f5f5f4]">
-                            <th class="px-6 py-3 text-left text-[10px] font-semibold text-[#a3a3a3] uppercase tracking-wider">Produit</th>
+                            <th @click="sortBy('name')" class="px-6 py-3 text-left text-[10px] font-semibold text-[#a3a3a3] uppercase tracking-wider cursor-pointer hover:text-[#0a0a0a] select-none">
+                                <span class="inline-flex items-center gap-1">
+                                    Produit
+                                    <svg v-if="sort === 'name'" class="w-3 h-3" :class="direction === 'asc' ? '' : 'rotate-180'" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 6l6 6H4z" />
+                                    </svg>
+                                </span>
+                            </th>
                             <th class="px-6 py-3 text-left text-[10px] font-semibold text-[#a3a3a3] uppercase tracking-wider">Référence</th>
-                            <th class="px-6 py-3 text-right text-[10px] font-semibold text-[#a3a3a3] uppercase tracking-wider">Prix</th>
-                            <th class="px-6 py-3 text-center text-[10px] font-semibold text-[#a3a3a3] uppercase tracking-wider">Stock</th>
+                            <th @click="sortBy('price')" class="px-6 py-3 text-right text-[10px] font-semibold text-[#a3a3a3] uppercase tracking-wider cursor-pointer hover:text-[#0a0a0a] select-none">
+                                <span class="inline-flex items-center gap-1 justify-end">
+                                    Prix
+                                    <svg v-if="sort === 'price'" class="w-3 h-3" :class="direction === 'asc' ? '' : 'rotate-180'" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 6l6 6H4z" />
+                                    </svg>
+                                </span>
+                            </th>
+                            <th @click="sortBy('stock_quantity')" class="px-6 py-3 text-center text-[10px] font-semibold text-[#a3a3a3] uppercase tracking-wider cursor-pointer hover:text-[#0a0a0a] select-none">
+                                <span class="inline-flex items-center gap-1 justify-center">
+                                    Stock
+                                    <svg v-if="sort === 'stock_quantity'" class="w-3 h-3" :class="direction === 'asc' ? '' : 'rotate-180'" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 6l6 6H4z" />
+                                    </svg>
+                                </span>
+                            </th>
                             <th class="px-6 py-3 text-right text-[10px] font-semibold text-[#a3a3a3] uppercase tracking-wider w-32"></th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="product in filtered" :key="product.id" class="border-b border-[#fafaf9] hover:bg-[#fafaf9]">
+                        <tr v-for="product in products" :key="product.id" class="border-b border-[#fafaf9] hover:bg-[#fafaf9]">
                             <td class="px-6 py-4 text-[13px] font-medium text-[#0a0a0a]">{{ product.name }}</td>
                             <td class="px-6 py-4 text-[12px] text-[#737373] font-mono">{{ product.sku }}</td>
                             <td class="px-6 py-4 text-[13px] font-medium text-[#0a0a0a] text-right tabular-nums">{{ formatCFA(product.price) }}</td>
