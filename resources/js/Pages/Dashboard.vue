@@ -1,8 +1,8 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import WelcomeSplash from '@/Components/WelcomeSplash.vue';
-import { Head, Link } from '@inertiajs/vue3';
-import { ref, onMounted } from 'vue';
+import { Head, Link, usePage } from '@inertiajs/vue3';
+import { ref, computed, onMounted } from 'vue';
 import { formatCFA } from '@/Utils/format';
 
 defineProps({
@@ -13,26 +13,47 @@ defineProps({
     activity: { type: Array, default: () => [] },
 });
 
+/* ---------- Splash (une fois par session) ---------- */
 const showSplash = ref(false);
-
 onMounted(() => {
     if (!sessionStorage.getItem('splash_seen')) {
         showSplash.value = true;
         sessionStorage.setItem('splash_seen', '1');
     }
 });
-
 const onSplashFinished = () => { showSplash.value = false; };
 
-const cards = [
-    { label: 'Produits au catalogue', key: 'products', href: 'products.index', color: 'from-[#1e3a8a] to-[#3b82f6]', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' },
-    { label: 'Clients actifs', key: 'clients', href: 'clients.index', color: 'from-[#0891b2] to-[#22d3ee]', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z' },
-    { label: 'Devis en attente', key: 'quotes_pending', href: 'quotes.index', color: 'from-[#10b981] to-[#34d399]', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
-    { label: 'Factures impayées', key: 'invoices_unpaid', href: 'invoices.index', color: 'from-[#f59e0b] to-[#d97706]', icon: 'M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z' },
-];
+/* ---------- Accès par rôle ----------
+   Si les rôles ne sont pas partagés par Inertia (roles absent),
+   on affiche tout plutôt que de masquer le dashboard. */
+const roles = computed(() => usePage().props.auth?.user?.roles);
+const can = (allowed) =>
+    !roles.value || roles.value.includes('admin') || allowed.some((r) => roles.value.includes(r));
 
+/* ---------- Cartes de synthèse ---------- */
+const allCards = [
+    { label: 'Chiffre d\'affaires du mois', key: 'revenue_month', money: true, href: 'invoices.index', roles: ['commercial'], color: 'from-[#1e3a8a] to-[#3b82f6]', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
+    { label: 'Devis en attente', key: 'quotes_pending', href: 'quotes.index', roles: ['commercial'], color: 'from-[#10b981] to-[#34d399]', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
+    { label: 'Factures impayées', key: 'invoices_unpaid', href: 'invoices.index', roles: ['commercial'], color: 'from-[#f59e0b] to-[#d97706]', icon: 'M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z' },
+    { label: 'Factures en retard (+30 j)', key: 'invoices_late', href: 'invoices.index', roles: ['commercial'], color: 'from-[#dc2626] to-[#f87171]', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
+    { label: 'Produits au catalogue', key: 'products', href: 'products.index', roles: ['magasinier'], color: 'from-[#1e3a8a] to-[#3b82f6]', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' },
+    { label: 'Produits en alerte de stock', key: 'low_stock_count', href: 'products.index', roles: ['magasinier'], color: 'from-[#dc2626] to-[#f87171]', icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z' },
+    { label: 'Clients actifs', key: 'clients', href: 'clients.index', roles: ['commercial'], color: 'from-[#0891b2] to-[#22d3ee]', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z' },
+];
+const cards = computed(() => allCards.filter((c) => can(c.roles)));
+
+/* ---------- Formats ---------- */
 const formatDate = (date) => new Date(date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
 const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+
+/* Adapter les libellés ci-dessous aux statuts exacts de ta base si besoin */
+const statusClass = (status) => {
+    const s = (status || '').toLowerCase();
+    if (s === 'payée' || s === 'payee' || s === 'paid') return 'bg-emerald-100 text-emerald-700';
+    if (s === 'impayée' || s === 'impayee' || s === 'unpaid') return 'bg-amber-100 text-amber-700';
+    if (s === 'annulée' || s === 'annulee' || s === 'cancelled') return 'bg-slate-200 text-slate-600';
+    return 'bg-slate-100 text-slate-600';
+};
 </script>
 
 <template>
@@ -43,8 +64,9 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
     <AuthenticatedLayout>
         <div class="max-w-[1400px] mx-auto">
 
+            <!-- Cartes de synthèse (filtrées par rôle) -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <Link v-for="(card, i) in cards" :key="i" :href="route(card.href)"
+                <Link v-for="card in cards" :key="card.key" :href="route(card.href)"
                       class="bg-white border border-slate-200 rounded-2xl p-6 hover:border-[#22d3ee] hover:shadow-xl hover:shadow-[#22d3ee]/10 transition-all group">
                     <div class="flex items-center justify-between mb-6">
                         <div class="w-11 h-11 rounded-xl flex items-center justify-center shadow-md" :class="`bg-gradient-to-br ${card.color}`">
@@ -56,8 +78,9 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                             <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
                     </div>
-                    <div class="text-[36px] font-bold text-[#1e3a8a] tabular-nums leading-none tracking-[-0.02em]">
-                        {{ stats[card.key] ?? 0 }}
+                    <div class="font-bold text-[#1e3a8a] tabular-nums leading-none tracking-[-0.02em]"
+                         :class="card.money ? 'text-[26px]' : 'text-[36px]'">
+                        {{ card.money ? formatCFA(stats[card.key] ?? 0) : (stats[card.key] ?? 0) }}
                     </div>
                     <div class="text-[10px] text-slate-500 uppercase tracking-[0.14em] font-semibold mt-3">
                         {{ card.label }}
@@ -67,10 +90,12 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
+                <!-- Colonne principale -->
                 <div class="lg:col-span-2 space-y-5">
 
-                    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-                        <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-[#22d3ee]/10 to-transparent">
+                    <!-- Alertes de stock (magasinier / admin) -->
+                    <div v-if="can(['magasinier'])" class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+                        <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-red-100/60 to-transparent">
                             <div>
                                 <h2 class="text-[14px] font-bold text-[#1e3a8a]">Alertes de stock</h2>
                                 <p class="text-[11px] text-slate-500 mt-0.5">Produits sous le seuil de réapprovisionnement</p>
@@ -88,21 +113,24 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                             <Link v-for="product in low_stock" :key="product.id" :href="route('products.show', product.id)"
                                   class="flex items-center justify-between px-6 py-4 hover:bg-slate-50 transition-colors">
                                 <div class="flex items-center gap-4">
-                                    <div class="w-1 h-10 rounded-full bg-gradient-to-b from-[#22d3ee] to-[#10b981]"></div>
+                                    <div class="w-1 h-10 rounded-full" :class="product.stock_quantity === 0 ? 'bg-red-500' : 'bg-amber-500'"></div>
                                     <div>
                                         <div class="text-[13px] font-medium text-[#1e3a8a]">{{ product.name }}</div>
                                         <div class="text-[11px] text-slate-500 font-mono mt-0.5">{{ product.sku }}</div>
                                     </div>
                                 </div>
                                 <div class="text-right">
-                                    <div class="text-[14px] font-bold text-[#10b981] tabular-nums">{{ product.stock_quantity }}</div>
+                                    <div class="text-[14px] font-bold tabular-nums" :class="product.stock_quantity === 0 ? 'text-red-600' : 'text-amber-600'">
+                                        {{ product.stock_quantity === 0 ? 'Rupture' : product.stock_quantity }}
+                                    </div>
                                     <div class="text-[10px] text-slate-500 uppercase tracking-[0.12em] mt-0.5">seuil {{ product.stock_alert }}</div>
                                 </div>
                             </Link>
                         </div>
                     </div>
 
-                    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+                    <!-- Devis récents (commercial / admin) -->
+                    <div v-if="can(['commercial'])" class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
                         <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-[#10b981]/10 to-transparent">
                             <div>
                                 <h2 class="text-[14px] font-bold text-[#1e3a8a]">Devis récents</h2>
@@ -129,11 +157,43 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                         </div>
                     </div>
 
+                    <!-- Factures récentes (commercial / admin) -->
+                    <div v-if="can(['commercial'])" class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+                        <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-[#f59e0b]/10 to-transparent">
+                            <div>
+                                <h2 class="text-[14px] font-bold text-[#1e3a8a]">Factures récentes</h2>
+                                <p class="text-[11px] text-slate-500 mt-0.5">Dernières factures émises et leur statut</p>
+                            </div>
+                            <Link :href="route('invoices.index')" class="text-[10px] uppercase tracking-[0.16em] font-semibold text-[#d97706] hover:text-[#1e3a8a] transition-colors">
+                                Consulter
+                            </Link>
+                        </div>
+
+                        <div v-if="recent_invoices.length === 0" class="px-6 py-12 text-center">
+                            <p class="text-[13px] text-slate-500">Aucune facture émise.</p>
+                        </div>
+
+                        <div v-else class="divide-y divide-slate-100">
+                            <Link v-for="invoice in recent_invoices" :key="invoice.id" :href="route('invoices.show', invoice.id)"
+                                  class="flex items-center justify-between px-6 py-4 hover:bg-slate-50 transition-colors">
+                                <div>
+                                    <div class="text-[13px] font-bold text-[#1e3a8a] font-mono">{{ invoice.reference }}</div>
+                                    <div class="text-[11px] text-slate-500 mt-0.5">{{ invoice.client?.name }} · {{ formatDate(invoice.created_at) }}</div>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <span class="text-[10px] font-semibold px-2.5 py-1 rounded-full" :class="statusClass(invoice.status)">{{ invoice.status }}</span>
+                                    <div class="text-[14px] font-bold text-[#1e3a8a] tabular-nums">{{ formatCFA(invoice.total_amount) }}</div>
+                                </div>
+                            </Link>
+                        </div>
+                    </div>
+
                 </div>
 
+                <!-- Colonne latérale -->
                 <div class="space-y-5">
 
-                    <div class="rounded-2xl p-6 text-white shadow-lg" style="background: linear-gradient(135deg, #1e3a8a 0%, #22d3ee 50%, #10b981 100%);">
+                    <div v-if="can(['commercial'])" class="rounded-2xl p-6 text-white shadow-lg" style="background: linear-gradient(135deg, #1e3a8a 0%, #22d3ee 50%, #10b981 100%);">
                         <div class="text-[10px] uppercase tracking-[0.2em] text-white/85 font-semibold">En attente</div>
                         <div class="text-[11px] text-white/75 mt-1">Devis non convertis</div>
                         <div class="text-[28px] font-bold tabular-nums mt-4 tracking-[-0.01em] drop-shadow-sm">
@@ -144,7 +204,7 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                         </div>
                     </div>
 
-                    <div class="bg-white border border-slate-200 rounded-2xl p-6">
+                    <div v-if="can(['commercial'])" class="bg-white border border-slate-200 rounded-2xl p-6">
                         <div class="text-[10px] uppercase tracking-[0.2em] text-[#f59e0b] font-semibold">À encaisser</div>
                         <div class="text-[11px] text-slate-500 mt-1">Factures impayées</div>
                         <div class="text-[28px] font-bold text-[#1e3a8a] tabular-nums mt-4 tracking-[-0.01em]">
@@ -152,10 +212,14 @@ const formatDateTime = (date) => new Date(date).toLocaleString('fr-FR', { day: '
                         </div>
                         <div class="text-[12px] text-slate-500 mt-2">
                             {{ stats.invoices_unpaid ?? 0 }} facture<span v-if="(stats.invoices_unpaid ?? 0) > 1">s</span>
+                            <span v-if="(stats.invoices_late ?? 0) > 0" class="text-red-600 font-semibold">
+                                dont {{ stats.invoices_late }} en retard
+                            </span>
                         </div>
                     </div>
 
-                    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+                    <!-- Activité récente (admin uniquement) -->
+                    <div v-if="can([])" class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
                         <div class="px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-[#1e3a8a]/5 to-transparent">
                             <h2 class="text-[14px] font-bold text-[#1e3a8a]">Activité récente</h2>
                         </div>
